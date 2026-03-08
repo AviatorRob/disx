@@ -340,7 +340,7 @@ public class DisxSystemMessages {
 
     }
 
-    public static void forcingLiveYtSrc(MinecraftServer server){
+    @Deprecated public static void forcingLiveYtSrc(MinecraftServer server){
         boolean configuredForLiveSrc = Boolean.parseBoolean(DisxConfigHandler.SERVER.getProperty("use_live_ytsrc"));
         if (DisxModInfo.isForceLiveytsrc() && !configuredForLiveSrc){
             MutableComponent message = Component.translatable("sysmsg.disx.notice_forced_disxlivesrc")
@@ -364,7 +364,7 @@ public class DisxSystemMessages {
 
     }
 
-    public static void forcingDisxYtSrcApi(MinecraftServer server){
+    @Deprecated public static void forcingDisxYtSrcApi(MinecraftServer server){
         boolean configuredForLiveSrc = Boolean.parseBoolean(DisxConfigHandler.SERVER.getProperty("use_live_ytsrc"));
         if (DisxModInfo.isForceDisxytsrcapi() && configuredForLiveSrc){
             MutableComponent message = Component.translatable("sysmsg.disx.notice_forced_disxytsrcapi")

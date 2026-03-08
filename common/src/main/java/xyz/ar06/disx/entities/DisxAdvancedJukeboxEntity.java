@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import xyz.ar06.disx.items.DisxCustomDisc;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 
 import java.util.UUID;
@@ -122,7 +123,7 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
             String videoId = compoundTag.getString("videoId");
             if (discName.equals("Video Not Found")){
                 DisxLogger.debug("Disc has no name. Attempting to find one...");
-                String videoName = DisxYoutubeInfoScraper.scrapeTitle(videoId);
+                String videoName = DisxYTDLPWrapper.getVideoName(videoId);
                 if (!videoName.equals("Video Not Found")){
                     DisxLogger.debug("Found updated name: " + videoName);
                     compoundTag.putString("discName", videoName);

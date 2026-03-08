@@ -30,10 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import xyz.ar06.disx.*;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import xyz.ar06.disx.items.DisxCustomDisc;
-import xyz.ar06.disx.utils.DisxEnderAdvancedJukeboxInventoryHelper;
-import xyz.ar06.disx.utils.DisxInternetCheck;
-import xyz.ar06.disx.utils.DisxJukeboxUsageCooldownManager;
-import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
+import xyz.ar06.disx.utils.*;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -142,7 +139,7 @@ public class DisxEnderAdvancedJukebox extends Block{
                 String videoId = compoundTag.getString("videoId");
                 if (discName.equals("Video Not Found")){
                     DisxLogger.debug("Disc has no name. Attempting to find one...");
-                    String videoName = DisxYoutubeInfoScraper.scrapeTitle(videoId);
+                    String videoName = DisxYTDLPWrapper.getVideoName(videoId);
                     if (!videoName.equals("Video Not Found")){
                         DisxLogger.debug("Found updated name: " + videoName);
                         compoundTag.putString("discName", videoName);

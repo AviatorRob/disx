@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import xyz.ar06.disx.DisxSystemMessages;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import xyz.ar06.disx.items.DisxRecordStamp;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 import xyz.ar06.disx.utils.DisxYoutubeTitleScraper;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -57,9 +58,9 @@ public class DisxStampCommand {
             context.getSource().sendFailure(Component.translatable("sysmsg.disx.stampcmd.no_player_err"));
             throw new RuntimeException(e);
         }
-        ArrayList<String> title_and_length = DisxYoutubeInfoScraper.scrapeLengthAndTitle(videoId);
-        String videoName = title_and_length.get(0);
-        if (videoName.equals("Video Not Found") && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")) {
+        ArrayList<String> title_and_length = DisxYTDLPWrapper.getTitleAndLength(videoId);
+
+        if (title_and_length == null && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")) {
             if (context.getSource().isPlayer()){
                 DisxSystemMessages.noVideoFound(context.getSource().getPlayer());
             } else {
@@ -67,6 +68,7 @@ public class DisxStampCommand {
             }
             return;
         }
+        String videoName = title_and_length.get(0);
         int videoLength = Integer.valueOf(title_and_length.get(1));
         if (videoLength > 1800) {
             if (context.getSource().isPlayer()){

@@ -14,9 +14,6 @@ public class DisxPropertyTypeSuggestionProvider {
         suggestionsBuilder.suggest("video_existence_check");
         suggestionsBuilder.suggest("max_audio_players");
         suggestionsBuilder.suggest("debug_mode");
-        if (!Platform.isForge()){
-            suggestionsBuilder.suggest("use_live_ytsrc");
-        }
         suggestionsBuilder.suggest("audio_radius");
         suggestionsBuilder.suggest("sound_particles");
         //suggestionsBuilder.suggest("refresh_token");

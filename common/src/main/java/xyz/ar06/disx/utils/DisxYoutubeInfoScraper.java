@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 
+@Deprecated
 public class DisxYoutubeInfoScraper {
     private static String apiURL = "http://disxytsourceapi.ar06.xyz/video_info";
     public static String scrapeTitle(String videoId){

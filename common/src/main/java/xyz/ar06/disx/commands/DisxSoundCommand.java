@@ -6,6 +6,7 @@ import xyz.ar06.disx.DisxLogger;
 import xyz.ar06.disx.utils.DisxInternetCheck;
 import xyz.ar06.disx.DisxServerAudioRegistry;
 import xyz.ar06.disx.DisxSystemMessages;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -86,12 +87,10 @@ public class DisxSoundCommand {
             if (DisxServerAudioRegistry.isNodeAtLocation(blockPos, dimension)){
                 throw new Exception("Audio At Location");
             }
-            ArrayList<String> title_and_length = DisxYoutubeInfoScraper.scrapeLengthAndTitle(videoId);
-            String videoTitle = title_and_length.get(0);
-            if (videoTitle.equals("Video Not Found") && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
+            int videoLength = DisxYTDLPWrapper.getVideoLength(videoId);
+            if (videoLength == -1 && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
                 throw new Exception("Video Not Found");
             }
-            int videoLength = Integer.valueOf(title_and_length.get(1));
             if (videoLength > 1800) {
                 throw new Exception("Too Long");
             }

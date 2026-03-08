@@ -4,6 +4,7 @@ import xyz.ar06.disx.DisxLogger;
 import xyz.ar06.disx.utils.DisxInternetCheck;
 import xyz.ar06.disx.DisxMain;
 import xyz.ar06.disx.DisxSystemMessages;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 import xyz.ar06.disx.utils.DisxYoutubeTitleScraper;
 import xyz.ar06.disx.commands.suggestionProviders.DisxTypeSuggestionProvider;
@@ -90,7 +91,7 @@ public class DisxGenCommand {
             //Response<VideoInfo> videoInfoResponse = null;
             //DisxLogger.debug("videoInfoResponse initialized");
             //videoInfoResponse = ytDownloader.getVideoInfo(videoInfoRequest);
-            ArrayList<String> title_and_length = DisxYoutubeInfoScraper.scrapeLengthAndTitle(videoId);
+            ArrayList<String> title_and_length = DisxYTDLPWrapper.getTitleAndLength(videoId);
             if (title_and_length == null){
                 throw new Exception("Video Not Found");
             }

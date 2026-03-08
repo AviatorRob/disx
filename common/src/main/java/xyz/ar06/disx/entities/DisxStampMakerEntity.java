@@ -6,6 +6,7 @@ import xyz.ar06.disx.DisxLogger;
 import xyz.ar06.disx.utils.DisxInternetCheck;
 import xyz.ar06.disx.DisxMain;
 import xyz.ar06.disx.DisxSystemMessages;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 import xyz.ar06.disx.utils.DisxYoutubeTitleScraper;
 import xyz.ar06.disx.blocks.DisxLacquerBlock;
@@ -216,12 +217,12 @@ public class DisxStampMakerEntity extends BlockEntity implements Container, Worl
             if (!DisxInternetCheck.checkInternet()){
                 DisxSystemMessages.noInternetErrorMessage(player);
             } else {
-                ArrayList<String> title_and_length = DisxYoutubeInfoScraper.scrapeLengthAndTitle(this.videoId);
-                String videoName = title_and_length.get(0);
-                if (videoName.equals("Video Not Found") && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
+                ArrayList<String> title_and_length = DisxYTDLPWrapper.getTitleAndLength(this.videoId);
+                if (title_and_length == null && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
                     DisxSystemMessages.noVideoFound(player);
                     return;
                 }
+                String videoName = title_and_length.get(0);
                 int videoLength = Integer.valueOf(title_and_length.get(1));
                 if (videoLength > 1800) {
                     DisxSystemMessages.badDuration(player);
@@ -264,12 +265,12 @@ public class DisxStampMakerEntity extends BlockEntity implements Container, Worl
             if (!DisxInternetCheck.checkInternet()){
                 DisxSystemMessages.noInternetFoundStampMakerAsync(this.getLevel().getServer(), this.getBlockPos());
             } else {
-                ArrayList<String> title_and_length = DisxYoutubeInfoScraper.scrapeLengthAndTitle(this.videoId);
-                String videoName = title_and_length.get(0);
-                if (videoName.equals("Video Not Found") && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
+                ArrayList<String> title_and_length = DisxYTDLPWrapper.getTitleAndLength(this.videoId);
+                if (title_and_length == null && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
                     DisxSystemMessages.videoNotFoundStampMakerAsync(this.getLevel().getServer(), this.getBlockPos());
                     return;
                 }
+                String videoName = title_and_length.get(0);
                 int videoLength = Integer.valueOf(title_and_length.get(1));
                 if (videoLength > 1800) {
                     DisxSystemMessages.badDurationStampMakerAsync(this.getLevel().getServer(), this.getBlockPos());

@@ -53,6 +53,7 @@ import xyz.ar06.disx.client_only.DisxAudioInstanceRegistry;
 import xyz.ar06.disx.client_only.DisxConfigRecordS2C;
 import xyz.ar06.disx.items.DisxAdvancedJukeboxMinecartItem;
 import xyz.ar06.disx.items.DisxCustomDisc;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 
 import java.util.Properties;
@@ -253,7 +254,7 @@ public class DisxAdvancedJukeboxMinecart extends Minecart implements ContainerEn
             String videoId = compoundTag.getString("videoId");
             if (discName.equals("Video Not Found")){
                 DisxLogger.debug("Disc has no name. Attempting to find one...");
-                String videoName = DisxYoutubeInfoScraper.scrapeTitle(videoId);
+                String videoName = DisxYTDLPWrapper.getVideoName(videoId);
                 if (!videoName.equals("Video Not Found")){
                     DisxLogger.debug("Found updated name: " + videoName);
                     compoundTag.putString("discName", videoName);

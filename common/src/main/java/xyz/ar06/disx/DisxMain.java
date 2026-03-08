@@ -35,6 +35,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -100,7 +101,6 @@ public class DisxMain {
 
         //Pull Mod Info
         DisxModInfo.pullLatestVersion();
-        DisxModInfo.pullForceSettings();
 
         //Fuel Registrations done in individual client loaders
 
@@ -131,9 +131,9 @@ public class DisxMain {
 
         LifecycleEvent.SERVER_STARTED.register(DisxAudioStreamingNode::initPlayerManager);
 
-        LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingDisxYtSrcApi);
+        //LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingDisxYtSrcApi);
 
-        LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingLiveYtSrc);
+        //LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingLiveYtSrc);
 
         LifecycleEvent.SERVER_STARTED.register((server) -> {
             if (DisxModInfo.isTESTTRACK()){
@@ -142,6 +142,8 @@ public class DisxMain {
         });
 
         LifecycleEvent.SERVER_STARTING.register(DisxTmpHandler::onServerStart);
+
+        LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractYTDLP);
 
         InteractionEvent.RIGHT_CLICK_BLOCK.register(DisxAdvancedJukebox::leverListener);
 

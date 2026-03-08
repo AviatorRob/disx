@@ -71,10 +71,6 @@ public class DisxConfigCommand {
                                             .executes(DisxConfigCommand::runRemoveDimensionBlacklist))))
                     .then(Commands.literal("reload")
                             .executes(DisxConfigCommand::runConfigReload))
-                    .then(Commands.literal("genRefreshToken")
-                            .executes(DisxConfigCommand::runGenRefreshToken))
-                    .then(Commands.literal("clearRefreshToken")
-                            .executes(DisxConfigCommand::clearRefreshToken))
             );
         });
     }
@@ -88,10 +84,6 @@ public class DisxConfigCommand {
             if (DisxConfigHandler.SERVER.getProperty(property) == null || property.equals("refresh_token")){
                 context.getSource().sendFailure(Component.translatable("sysmsg.disx.configcmd_invalid_property"));
             } else {
-                if (property.equals("use_live_ytsrc") && Platform.isForge()) {
-                    context.getSource().sendFailure(Component.literal("This feature is currently only available on Fabric and Quilt."));
-                    return 1;
-                }
                 DisxConfigHandler.SERVER.updateProperty(property, value);
                 context.getSource().sendSystemMessage(Component.translatable("sysmsg.disx.configcmd_property_changed", property, value));
             }

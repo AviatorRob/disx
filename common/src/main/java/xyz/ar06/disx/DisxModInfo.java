@@ -38,10 +38,10 @@ public class DisxModInfo {
 
     //DYNAMIC INFORMATION STORES
     private static boolean DEBUG = false;
-    private static boolean USE_YTSRC = false;
+    @Deprecated static boolean USE_YTSRC = false;
     private static String LATEST_VERSION = "N/A - NO INTERNET";
-    private static boolean FORCE_LIVEYTSRC = false;
-    private static boolean FORCE_DISXYTSRCAPI = false;
+    @Deprecated private static boolean FORCE_LIVEYTSRC = false;
+    @Deprecated private static boolean FORCE_DISXYTSRCAPI = false;
     private static String REFRESH_TOKEN = "";
     private static boolean SOUND_PARTICLES = true;
     private static Boolean isUpToDate = true;
@@ -101,7 +101,7 @@ public class DisxModInfo {
         }
     }
 
-    public static void pullForceSettings(){
+    @Deprecated public static void pullForceSettings(){
         try {
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpRequest httpRequest = HttpRequest.newBuilder()
@@ -206,7 +206,7 @@ public class DisxModInfo {
         return debugKeys;
     }
 
-    public static void setUseYtsrc(boolean useYtsrc) {
+    @Deprecated public static void setUseYtsrc(boolean useYtsrc) {
         USE_YTSRC = useYtsrc;
     }
 
