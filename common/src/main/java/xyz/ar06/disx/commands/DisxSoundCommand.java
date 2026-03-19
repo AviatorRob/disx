@@ -1,13 +1,12 @@
 package xyz.ar06.disx.commands;
 
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.DisxLogger;
 import xyz.ar06.disx.utils.DisxInternetCheck;
 import xyz.ar06.disx.DisxServerAudioRegistry;
 import xyz.ar06.disx.DisxSystemMessages;
 import xyz.ar06.disx.utils.DisxYTDLPWrapper;
-import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -79,6 +78,8 @@ public class DisxSoundCommand {
             Integer startTime = context.getArgument("startTime", Integer.class);
             Integer volumePercentage = context.getArgument("volume", Integer.class);
             Boolean loop = context.getArgument("loop", Boolean.class);
+            int rogueRadius = -1;
+            ArrayList<DisxAudioFilterType> audioFilters = new ArrayList<DisxAudioFilterType>();
             DisxLogger.debug("START TIME PROVIDED: " + startTime);
             boolean hasInternet = DisxInternetCheck.checkInternet();
             if (!hasInternet){
@@ -95,9 +96,9 @@ public class DisxSoundCommand {
                 throw new Exception("Too Long");
             }
             if (!context.getSource().isPlayer()){
-                DisxServerAudioRegistry.addToRegistry(blockPos, videoId, null, context.getSource().getServer(), dimension, startTime.intValue(), loop, volumePercentage);
+                DisxServerAudioRegistry.addToRegistry(blockPos, videoId, null, context.getSource().getServer(), dimension, startTime.intValue(), loop, volumePercentage, rogueRadius, audioFilters);
             } else {
-                DisxServerAudioRegistry.addToRegistry(blockPos, videoId, context.getSource().getPlayer(), context.getSource().getServer(), dimension, startTime.intValue(), loop, volumePercentage);
+                DisxServerAudioRegistry.addToRegistry(blockPos, videoId, context.getSource().getPlayer(), context.getSource().getServer(), dimension, startTime.intValue(), loop, volumePercentage, rogueRadius, audioFilters);
             }
             context.getSource().sendSystemMessage(Component.translatable("sysmsg.disx.soundcmd.attempting_playback", videoId, blockPos.toString(), dimension.toString()));
         } catch (Exception e){

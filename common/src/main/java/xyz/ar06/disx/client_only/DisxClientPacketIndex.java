@@ -66,10 +66,11 @@ public class DisxClientPacketIndex  {
                 motionType = null;
             }
             UUID entityUuid = buf.readUUID();
+            int rogueRadius = buf.readInt();
             if (type.equals("add")){
                 DisxLogger.debug("calling for add");
                 CompletableFuture.runAsync(() -> {
-                    DisxAudioInstanceRegistry.newAudioPlayer(blockPos, dimensionLocation, instanceOwner, loop, preferredVolume, motionType, entityUuid);
+                    DisxAudioInstanceRegistry.newAudioPlayer(blockPos, dimensionLocation, instanceOwner, loop, preferredVolume, motionType, entityUuid, rogueRadius);
                 });
             }
             if (type.equals("remove")){
@@ -85,9 +86,9 @@ public class DisxClientPacketIndex  {
             if (type.equals("modify")){
                 CompletableFuture.runAsync(() -> {
                     if (motionType.equals(DisxAudioMotionType.LIVE)){
-                        DisxAudioInstanceRegistry.modifyAudioInstance(entityUuid, loop, preferredVolume);
+                        DisxAudioInstanceRegistry.modifyAudioInstance(entityUuid, loop, preferredVolume, rogueRadius);
                     } else {
-                        DisxAudioInstanceRegistry.modifyAudioInstance(blockPos, dimensionLocation, loop, preferredVolume);
+                        DisxAudioInstanceRegistry.modifyAudioInstance(blockPos, dimensionLocation, loop, preferredVolume, rogueRadius);
                     }
                 });
             }

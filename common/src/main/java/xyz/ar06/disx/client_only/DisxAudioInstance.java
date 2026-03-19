@@ -22,14 +22,18 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class DisxAudioInstance {
-    private static final AudioFormat audioFormat = new AudioFormat(
-            AudioFormat.Encoding.PCM_SIGNED,     // PCM signed encoding
-            44100,                              // Sample rate (44.1kHz is common)
-            16,                                 // Sample size in bits (16-bit audio)
-            2,                                  // Number of channels (stereo in this case)
-            4,                                  // Frame size (2 bytes per channel = 4 bytes per frame)
-            44100,                              // Frame rate (same as sample rate for PCM)
-            true                                // Big-endian byte order
+    public static int bitDepth = 16;
+    public static int channelCount = 2;
+    public static int frameSize = (bitDepth / 8) * channelCount;
+    public static int sampleRate = 48000;
+    public static double streamInterval = 5;
+    public static int chunkSize = (int) (sampleRate * frameSize * streamInterval); //(calculates to 882000)
+    public AudioFormat audioFormat = new AudioFormat(
+            sampleRate,
+            bitDepth,       // sample size in bits
+            channelCount,        // channels
+            true,     // signed
+            true      // big-endian
     );
 
     private BlockPos blockPos;
@@ -44,7 +48,8 @@ public class DisxAudioInstance {
     private int preferredVolume;
     private DisxAudioMotionType motionType;
     private UUID entityUuid;
-    public DisxAudioInstance(BlockPos blockPos, ResourceLocation dimension, UUID instanceOwner, boolean loop, int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid){
+    private int rogueRadius;
+    public DisxAudioInstance(BlockPos blockPos, ResourceLocation dimension, UUID instanceOwner, boolean loop, int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid, int rogueRadius){
         DisxLogger.debug("New DisxAudioInstance called for; setting details:");
         this.blockPos = blockPos;
         this.dimension = dimension;
@@ -53,6 +58,7 @@ public class DisxAudioInstance {
         this.preferredVolume = preferredVolume;
         this.motionType = motionType;
         this.entityUuid = entityUuid;
+        this.rogueRadius = rogueRadius;
         DisxLogger.debug("Details set successfully");
         DisxLogger.debug("Building audio line and controls");
         this.buildAudioLine();
@@ -149,6 +155,7 @@ public class DisxAudioInstance {
     public void addToPacketDataQueue(byte[] data){
         this.audioDataPacketQueue.add(data);
     }
+
     private void writingLoop(ClientLevel clientLevel){
         CompletableFuture.runAsync(() -> {
             if (!writingToLine && !audioDataPacketQueue.isEmpty() && this.audioLine != null){
@@ -307,4 +314,10 @@ public class DisxAudioInstance {
     public UUID getEntityUuid() {
         return entityUuid;
     }
+
+    public void setRogueRadius(int rogueRadius) {
+        this.rogueRadius = rogueRadius;
+    }
+
+    public int getRogueRadius() {return rogueRadius;}
 }

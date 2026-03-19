@@ -2,6 +2,7 @@ package xyz.ar06.disx;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.entities.DisxStampMakerEntity;
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -15,6 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 
 public class DisxServerPacketIndex {
@@ -63,7 +67,8 @@ public class DisxServerPacketIndex {
                 int preferredVolume = node.getPreferredVolume();
                 DisxAudioMotionType motionType = node.getMotionType();
                 UUID entityUuid = node.getEntityUuid();
-                ServerPackets.AudioRegistrySyncPackets.add(player, blockPos, dimensionLocation, nodeOwnerUuid, loop, preferredVolume, motionType, entityUuid);
+                int rogueRadius = node.getRogueRadius();
+                ServerPackets.AudioRegistrySyncPackets.add(player, blockPos, dimensionLocation, nodeOwnerUuid, loop, preferredVolume, motionType, entityUuid, rogueRadius);
                 DisxLogger.debug("sent registry add event");
             }
         }
@@ -122,7 +127,7 @@ public class DisxServerPacketIndex {
 
         public class AudioRegistrySyncPackets {
             private static void packetBuildSend(String type, Player player, BlockPos pos, ResourceLocation dimension, UUID playerOwner, Boolean loop,
-                                                   int preferredVolume, String motionType, UUID entityUuid){
+                                                   int preferredVolume, String motionType, UUID entityUuid, int rogueRadius){
                 FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                 buf.writeUtf(type);
                 buf.writeBlockPos(pos);
@@ -132,23 +137,28 @@ public class DisxServerPacketIndex {
                 buf.writeInt(preferredVolume);
                 buf.writeUtf(motionType);
                 buf.writeUUID(entityUuid);
+                buf.writeInt(rogueRadius);
                 NetworkManager.sendToPlayer((ServerPlayer) player, new ResourceLocation("disx","serveraudioregistryevent"), buf);
             }
             public static void add(Player player, BlockPos pos, ResourceLocation dimension, UUID playerOwner, boolean loop,
-                                   int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid){
-                packetBuildSend("add", player, pos, dimension, playerOwner, loop, preferredVolume, motionType.name(), entityUuid);
+                                   int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid, int rogueRadius){
+                packetBuildSend("add", player, pos, dimension, playerOwner, loop, preferredVolume, motionType.name(), entityUuid, rogueRadius);
             }
 
             public static void modifyPrefVolume(Player player, BlockPos pos, ResourceLocation dimension, int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid){
-                packetBuildSend("modify", player, pos, dimension, new UUID(0L, 0L), null, preferredVolume, motionType.name(), entityUuid);
+                packetBuildSend("modify", player, pos, dimension, new UUID(0L, 0L), null, preferredVolume, motionType.name(), entityUuid, -1);
             }
 
             public static void modifyLoop(Player player, BlockPos pos, ResourceLocation dimension, boolean loop, DisxAudioMotionType motionType, UUID entityUuid){
-                packetBuildSend("modify", player, pos, dimension, new UUID(0L, 0L), loop, -1, motionType.name(), entityUuid);
+                packetBuildSend("modify", player, pos, dimension, new UUID(0L, 0L), loop, -1, motionType.name(), entityUuid, -1);
+            }
+
+            public static void modifyRogueRadius(Player player, BlockPos pos, ResourceLocation dimension, DisxAudioMotionType motionType, UUID entityUuid, int rogueRadius){
+                packetBuildSend("modify", player, pos, dimension, new UUID(0L, 0L), null, -1, motionType.name(), entityUuid, rogueRadius);
             }
 
             public static void remove(Player player, BlockPos pos, ResourceLocation dimension, UUID entityUuid, DisxAudioMotionType motionType){
-                packetBuildSend("remove", player, pos, dimension, new UUID(0L, 0L), false, -1, motionType.name(), entityUuid);
+                packetBuildSend("remove", player, pos, dimension, new UUID(0L, 0L), false, -1, motionType.name(), entityUuid, -1);
             }
         }
 

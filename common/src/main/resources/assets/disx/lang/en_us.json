@@ -21,6 +21,7 @@
   "item.disx.lacquer_drop": "Drop of Lacquer",
   "item.disx.record_stamp": "Record Stamp",
   "item.disx.advanced_jukebox_minecart": "Advanced Jukebox Minecart",
+  "enchantment.disx.retrograde_curse":  "Disx Curse of Retrograde",
   "sysmsg.disx.no_internet": "Disx Error: No internet connection available!",
   "sysmsg.disx.error_loading_vid": "Disx Error: Unknown error loading video!",
   "sysmsg.disx.error_api_response": "Disx Error: Invalid or incomplete response from Disx YT-SRC API. Check server logs for more information.",

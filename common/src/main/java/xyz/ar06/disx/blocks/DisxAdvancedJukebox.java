@@ -80,6 +80,13 @@ public class DisxAdvancedJukebox extends BaseEntityBlock {
             DisxServerAudioRegistry.modifyEntryLoop(blockPos, level.dimension(), loop);
         }
 
+        if (blockPos2.equals(blockPos.above())){
+            Block aboveBlock = level.getBlockState(blockPos2).getBlock();
+            if (aboveBlock.equals(Blocks.GOLD_BLOCK)){
+                DisxLogger.debug("Detected gold block placed above jukebox;");
+            }
+        }
+
     }
 
     @Override

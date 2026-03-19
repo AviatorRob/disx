@@ -48,6 +48,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import xyz.ar06.disx.*;
+import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.blocks.DisxAdvancedJukebox;
 import xyz.ar06.disx.client_only.DisxAudioInstanceRegistry;
 import xyz.ar06.disx.client_only.DisxConfigRecordS2C;
@@ -56,6 +57,7 @@ import xyz.ar06.disx.items.DisxCustomDisc;
 import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
@@ -225,7 +227,7 @@ public class DisxAdvancedJukeboxMinecart extends Minecart implements ContainerEn
             String videoId = tag.getString("videoId");
             if (!videoId.isEmpty()){
                 DisxLogger.debug("Calling add to registry (LIVE)");
-                DisxServerAudioRegistry.addToRegistry(this.getOnPos(), videoId, null, this.level().dimension(), false, DisxAudioMotionType.LIVE, this.getUUID());
+                DisxServerAudioRegistry.addToRegistry(this.getOnPos(), videoId, null, this.level().dimension(), false, DisxAudioMotionType.LIVE, this.getUUID(), -1, new ArrayList<DisxAudioFilterType>());
             }
         }
 
@@ -239,7 +241,7 @@ public class DisxAdvancedJukeboxMinecart extends Minecart implements ContainerEn
             String videoId = tag.getString("videoId");
             if (!videoId.isEmpty()){
                 DisxLogger.debug("Calling add to registry (LIVE)");
-                DisxServerAudioRegistry.addToRegistry(this.getOnPos(), videoId, player, this.level().dimension(), false, DisxAudioMotionType.LIVE, this.getUUID());
+                DisxServerAudioRegistry.addToRegistry(this.getOnPos(), videoId, player, this.level().dimension(), false, DisxAudioMotionType.LIVE, this.getUUID(), -1, new ArrayList<DisxAudioFilterType>());
             }
         }
         this.setChanged();

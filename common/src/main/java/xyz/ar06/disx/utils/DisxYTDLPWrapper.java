@@ -6,6 +6,7 @@ import net.minecraft.server.packs.resources.Resource;
 import xyz.ar06.disx.DisxLogger;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -170,6 +171,54 @@ public class DisxYTDLPWrapper {
         } else {
             return result;
         }
+    }
+
+    public static byte[] downloadToBuffer(String videoId) throws IOException, InterruptedException {
+            File dir = new File("./.disx-tmp");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // Unique filename (avoid collisions)
+            String filename = "track_" + System.currentTimeMillis() + ".wav";
+
+            // Run yt-dlp
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    ytdlp.getAbsolutePath(),
+                    "-f", "bestaudio",
+                    "-x",
+                    "--audio-format", "wav",
+                    "--postprocessor-args", "-ar 48000 -ac 2 -sample_fmt s16 -f s16be",
+                    "-o", "./.disx-tmp/" + filename,
+                    "https://www.youtube.com/watch?v=" + videoId
+            );
+
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream())
+            );
+
+            String line = "";
+            DisxLogger.debug("Attempting to run YTDLP subprocess");
+            while ((line = bufferedReader.readLine()) != null){
+                DisxLogger.debug("YTDLP OUTPUT: " + line);
+            }
+
+            int exitCode = process.waitFor();
+            File outputFile = new File(dir, filename);
+            if (exitCode != 0 || !outputFile.exists()) {
+                DisxLogger.debug("YTDLP process failed OR output file not created");
+            }
+
+            byte[] data = Files.readAllBytes(outputFile.toPath());
+
+            if (!outputFile.delete()) {
+                outputFile.deleteOnExit();
+            }
+
+            return data;
     }
 
 }

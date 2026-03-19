@@ -62,30 +62,11 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
-    //forgeRuntimeLibrary 'dev.arbjerg:lavaplayer:2.0.2'
-    /*forgeRuntimeLibrary group: 'org.json', name: 'json', version: '20230618'
-    forgeRuntimeLibrary group: 'com.github.sealedtx', name: 'java-youtube-downloader', version: '3.2.3'
-    forgeRuntimeLibrary 'org.junit.jupiter:junit-jupiter:5.8.1'
-    forgeRuntimeLibrary "dev.arbjerg:lavadsp:0.7.8"
-    forgeRuntimeLibrary group: 'org.jsoup', name: 'jsoup', version: '1.16.2' */
-
-
     forgeRuntimeLibrary 'com.alibaba:fastjson:+'
     forgeRuntimeLibrary 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
     forgeRuntimeLibrary 'com.fasterxml.jackson.core:jackson-core:2.17.2'
     forgeRuntimeLibrary 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
     forgeRuntimeLibrary 'com.github.walkyst.JAADec-fork:jaadec-ext-aac:0.1.3'
-    /*
-    include 'com.github.walkyst:lavaplayer-fork:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lava-common:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lavaplayer-ext-format-xm:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lavaplayer-ext-youtube-rotator:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lavaplayer-stream-merger:1.4.3'
-    include 'com.github.walkyst.lavaplayer-fork:lavaplayer-test-samples:1.4.3'
-    include 'com.github.walkyst:ibxm-fork:a75'
-    include 'com.github.walkyst:lavaplayer-natives-fork:1.0.2'
-    */
     forgeRuntimeLibrary group: 'org.json', name: 'json', version: '+'
     forgeRuntimeLibrary 'org.junit.jupiter:junit-jupiter:+'
     forgeRuntimeLibrary 'org.junit.jupiter:junit-jupiter-api:+'
@@ -96,32 +77,11 @@ dependencies {
     forgeRuntimeLibrary 'org.mozilla:rhino:+'
     forgeRuntimeLibrary 'org.mozilla:rhino-engine:+'
     forgeRuntimeLibrary 'org.opentest4j:opentest4j:+'
-    //forgeRuntimeLibrary 'com.github.aikaterna:lavaplayer-natives:original-SNAPSHOT'
-    //forgeRuntimeLibrary 'dev.arbjerg:lavaplayer:+'
-    ///forgeRuntimeLibrary 'dev.arbjerg:lavaplayer-natives:+'
     forgeRuntimeLibrary group: 'org.jsoup', name: 'jsoup', version: '+'
     forgeRuntimeLibrary 'org.apache.httpcomponents:httpclient:+'
     forgeRuntimeLibrary 'commons-logging:commons-logging:+'
     forgeRuntimeLibrary 'org.apache.httpcomponents:httpcore:+'
     forgeRuntimeLibrary group: 'com.grack', name: 'nanojson', version: '+'
-
-    include 'com.alibaba:fastjson:+'
-    //include 'com.fasterxml.jackson.core:jackson-annotations:+'
-    //include 'com.fasterxml.jackson.core:jackson-core:+'
-    //include 'com.fasterxml.jackson.core:jackson-databind:+'
-    //include 'com.github.walkyst.JAADec-fork:jaadec-ext-aac:+'
-    //include 'com.github.sealedtx:java-youtube-downloader:+'
-    include group: 'org.json', name: 'json', version: '+'
-    include 'org.junit.jupiter:junit-jupiter:+'
-    include 'org.junit.jupiter:junit-jupiter-api:+'
-    include 'org.junit.jupiter:junit-jupiter-engine:+'
-    include 'org.junit.jupiter:junit-jupiter-params:+'
-    include 'org.junit.platform:junit-platform-commons:+'
-    include 'org.junit.platform:junit-platform-engine:+'
-    //include 'org.mozilla:rhino:+'
-    //include 'org.mozilla:rhino-engine:+'
-    include 'org.opentest4j:opentest4j:+'
-    include group: 'org.jsoup', name: 'jsoup', version: '+'
 
     shadowDependencies 'com.alibaba:fastjson:+'
     shadowDependencies 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
@@ -143,6 +103,7 @@ dependencies {
     shadowDependencies 'commons-logging:commons-logging:+'
     shadowDependencies 'org.apache.httpcomponents:httpcore:+'
     shadowDependencies group: 'com.grack', name: 'nanojson', version: '+'
+    shadowDependencies("commons-io:commons-io:2.21.0")
 
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:${rootProject.forge_REI_version}"
 }

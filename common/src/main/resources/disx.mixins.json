@@ -6,7 +6,8 @@
   "client": [
   ],
   "mixins": [
-    "DisxEnderAdvancedJukeboxMixin"
+    "DisxEnderAdvancedJukeboxMixin",
+    "DisxAnvilMixin"
   ],
   "injectors": {
     "defaultRequire": 1

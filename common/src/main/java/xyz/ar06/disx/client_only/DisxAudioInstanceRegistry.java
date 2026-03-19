@@ -4,18 +4,12 @@ import io.netty.buffer.ByteBuf;
 import xyz.ar06.disx.DisxAudioMotionType;
 import xyz.ar06.disx.DisxAudioStreamingNode;
 import xyz.ar06.disx.DisxLogger;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import xyz.ar06.disx.DisxSystemMessages;
 
 import java.util.*;
-
-import static xyz.ar06.disx.DisxAudioStreamingNode.FORMAT;
 
 public class DisxAudioInstanceRegistry {
 
@@ -27,8 +21,8 @@ public class DisxAudioInstanceRegistry {
         DisxClientPacketIndex.ClientPackets.getServerAudioRegistry();
     }
 
-    public static void newAudioPlayer(BlockPos blockPos, ResourceLocation dimension, UUID instanceOwner, boolean loop, int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid){
-        registry.add(new DisxAudioInstance(blockPos, dimension, instanceOwner, loop, preferredVolume, motionType, entityUuid));
+    public static void newAudioPlayer(BlockPos blockPos, ResourceLocation dimension, UUID instanceOwner, boolean loop, int preferredVolume, DisxAudioMotionType motionType, UUID entityUuid, int rogueRadius){
+        registry.add(new DisxAudioInstance(blockPos, dimension, instanceOwner, loop, preferredVolume, motionType, entityUuid, rogueRadius));
         DisxLogger.debug("New DisxAudioInstance registered");
     }
 
@@ -72,7 +66,7 @@ public class DisxAudioInstanceRegistry {
 
     }
 
-    public static void modifyAudioInstance(BlockPos blockPos, ResourceLocation dimension, Boolean loop, int preferredVolume){
+    public static void modifyAudioInstance(BlockPos blockPos, ResourceLocation dimension, Boolean loop, int preferredVolume, int rogueRadius){
         try {
             for (DisxAudioInstance instance : registry){
                 if (instance.getBlockPos().equals(blockPos) && instance.getDimension().equals(dimension) && instance.getMotionType().equals(DisxAudioMotionType.STATIC)){
@@ -81,6 +75,9 @@ public class DisxAudioInstanceRegistry {
                     }
                     if (preferredVolume != -1){
                         instance.setPreferredVolume(preferredVolume);
+                    }
+                    if (rogueRadius != -1){
+                        instance.setRogueRadius(rogueRadius);
                     }
                     break;
                 }
@@ -91,7 +88,7 @@ public class DisxAudioInstanceRegistry {
         }
     }
 
-    public static void modifyAudioInstance(UUID entityUuid, Boolean loop, int preferredVolume){
+    public static void modifyAudioInstance(UUID entityUuid, Boolean loop, int preferredVolume, int rogueRadius){
         try {
             for (DisxAudioInstance instance : registry){
                 if (instance.getEntityUuid().equals(entityUuid) && instance.getMotionType().equals(DisxAudioMotionType.LIVE)){
@@ -101,6 +98,7 @@ public class DisxAudioInstanceRegistry {
                     if (preferredVolume != -1){
                         instance.setPreferredVolume(preferredVolume);
                     }
+                    if (rogueRadius != -1){instance.setRogueRadius(rogueRadius);}
                     break;
                 }
             }
@@ -147,12 +145,7 @@ public class DisxAudioInstanceRegistry {
             if (motionType.equals(DisxAudioMotionType.STATIC)){
                 for (DisxAudioInstance instance : registry){
                     if (instance.getBlockPos().equals(blockPos) && instance.getDimension().equals(dimension) && instance.getMotionType().equals(DisxAudioMotionType.STATIC)){
-                        int bitDepth = 16;
-                        int frameSize = (bitDepth / 8) * FORMAT.channelCount;
-                        int sampleRate = FORMAT.sampleRate;
-                        double streamInterval = DisxAudioStreamingNode.getStreamInterval();
-                        int chunkSize = (int) (sampleRate * frameSize * streamInterval); //(calculates to 441000)
-                        byte[] audioData = new byte[chunkSize];
+                        byte[] audioData = new byte[DisxAudioInstance.chunkSize];
                         buf.readBytes(audioData);
                         instance.addToPacketDataQueue(audioData);
                         break;
@@ -161,12 +154,7 @@ public class DisxAudioInstanceRegistry {
             } else {
                 for (DisxAudioInstance instance : registry){
                     if (instance.getEntityUuid().equals(entityUuid) && instance.getMotionType().equals(DisxAudioMotionType.LIVE)){
-                        int bitDepth = 16;
-                        int frameSize = (bitDepth / 8) * FORMAT.channelCount;
-                        int sampleRate = FORMAT.sampleRate;
-                        double streamInterval = DisxAudioStreamingNode.getStreamInterval();
-                        int chunkSize = (int) (sampleRate * frameSize * streamInterval); //(calculates to 441000)
-                        byte[] audioData = new byte[chunkSize];
+                        byte[] audioData = new byte[DisxAudioInstance.chunkSize];
                         buf.readBytes(audioData);
                         instance.addToPacketDataQueue(audioData);
                         break;

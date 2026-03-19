@@ -222,7 +222,7 @@ public class DisxModInfo {
         return FORCE_LIVEYTSRC;
     }
 
-    public static void setRefreshToken(String refreshToken) {
+    @Deprecated public static void setRefreshToken(String refreshToken) {
         REFRESH_TOKEN = refreshToken;
         if (REFRESH_TOKEN != null && !REFRESH_TOKEN.isEmpty()){
             try {

@@ -28,10 +28,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import xyz.ar06.disx.*;
+import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import xyz.ar06.disx.items.DisxCustomDisc;
 import xyz.ar06.disx.utils.*;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class DisxEnderAdvancedJukebox extends Block{
@@ -78,7 +80,7 @@ public class DisxEnderAdvancedJukebox extends Block{
                             DisxLogger.debug("Sending loading video message");
                             DisxServerPacketIndex.ServerPackets.loadingVideoIdMessage(videoId, player);
                             DisxLogger.debug("Calling add to registry (LIVE)");
-                            DisxServerAudioRegistry.addToRegistry(blockPos, videoId, player, level.dimension(), false, DisxAudioMotionType.LIVE, player.getUUID());
+                            DisxServerAudioRegistry.addToRegistry(blockPos, videoId, player, level.dimension(), false, DisxAudioMotionType.LIVE, player.getUUID(), -1, new ArrayList<DisxAudioFilterType>());
                             helper.disx$setEnderAdvancedJukeboxInventory(ContainerHelper.saveAllItems(new CompoundTag(), invList));
                             handStack.shrink(1);
                             level.playSound(null, blockPos, SoundEvents.ENDER_EYE_LAUNCH, SoundSource.BLOCKS, 1.0F, 1.0F);

@@ -4,8 +4,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.jetbrains.annotations.Nullable;
 import xyz.ar06.disx.*;
+import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.blocks.DisxAdvancedJukebox;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -21,10 +23,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
+import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
 import xyz.ar06.disx.items.DisxCustomDisc;
 import xyz.ar06.disx.utils.DisxYTDLPWrapper;
-import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerSingleItem, WorldlyContainer {
@@ -89,7 +92,14 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
             String videoId = itemStack.getTag().getString("videoId");
             int jukeboxPower = this.getLevel().getBestNeighborSignal(this.getBlockPos());
             boolean loop = jukeboxPower > 0;
-            DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, null, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L));
+            ArrayList<DisxAudioFilterType> audioFilters = new ArrayList<DisxAudioFilterType>();
+            int rogueRadius = -1;
+
+            if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+                audioFilters.add(DisxAudioFilterType.REVERSE);
+            }
+
+            DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, null, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
         } else {
             itemInventory.set(i, itemStack);
         }
@@ -102,7 +112,14 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
             String videoId = itemStack.getTag().getString("videoId");
             int jukeboxPower = this.getLevel().getBestNeighborSignal(this.getBlockPos());
             boolean loop = jukeboxPower > 0;
-            DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, player, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L));
+            ArrayList<DisxAudioFilterType> audioFilters = new ArrayList<DisxAudioFilterType>();
+            int rogueRadius = -1;
+
+            if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+                audioFilters.add(DisxAudioFilterType.REVERSE);
+            }
+
+            DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, player, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
         } else {
             itemInventory.set(i, itemStack);
         }

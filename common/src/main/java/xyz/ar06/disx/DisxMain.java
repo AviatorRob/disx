@@ -1,5 +1,6 @@
 package xyz.ar06.disx;
 
+import dev.architectury.event.events.client.ClientRecipeUpdateEvent;
 import dev.architectury.event.events.common.*;
 import dev.architectury.registry.fuel.FuelRegistry;
 import dev.architectury.utils.Env;
@@ -7,12 +8,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import xyz.ar06.disx.blocks.*;
 import xyz.ar06.disx.client_only.DisxClientMain;
 import xyz.ar06.disx.commands.*;
 import xyz.ar06.disx.config.DisxConfigHandler;
+import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
 import xyz.ar06.disx.entities.DisxAdvancedJukeboxEntity;
 import xyz.ar06.disx.entities.vehicle.DisxAdvancedJukeboxMinecart;
 import xyz.ar06.disx.items.*;
@@ -55,6 +58,7 @@ public class DisxMain {
         Registrar<RecipeType<?>> recipeTypeRegistrar = REGISTRAR_MANAGER.get().get(Registries.RECIPE_TYPE);
         Registrar<SoundEvent> soundEventRegistrar = REGISTRAR_MANAGER.get().get(Registries.SOUND_EVENT);
         Registrar<EntityType<?>> entityTypeRegistrar = REGISTRAR_MANAGER.get().get(Registries.ENTITY_TYPE);
+        Registrar<Enchantment> enchantmentRegistrar = REGISTRAR_MANAGER.get().get(Registries.ENCHANTMENT);
         //Creative Mode Tab Registration
         RegistrySupplier<CreativeModeTab> creativeModeTab = tabRegistrar.register(new ResourceLocation("disx", "creativemodetab.disx"), () -> CreativeTabRegistry.create(Component.translatable("category.disx.tab"), () -> new ItemStack(itemsRegistrar.get(new ResourceLocation("disx", "blank_disc")))));
         //Item Registration Calls
@@ -102,6 +106,8 @@ public class DisxMain {
         //Pull Mod Info
         DisxModInfo.pullLatestVersion();
 
+        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+
         //Fuel Registrations done in individual client loaders
 
         //Event Registrations
@@ -129,7 +135,7 @@ public class DisxMain {
 
         LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::devBuildNotice);
 
-        LifecycleEvent.SERVER_STARTED.register(DisxAudioStreamingNode::initPlayerManager);
+        //LifecycleEvent.SERVER_STARTED.register(DisxAudioStreamingNode::initPlayerManager);
 
         //LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingDisxYtSrcApi);
 
