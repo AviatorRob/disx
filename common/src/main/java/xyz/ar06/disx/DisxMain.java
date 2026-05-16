@@ -150,6 +150,7 @@ public class DisxMain {
         LifecycleEvent.SERVER_STARTING.register(DisxTmpHandler::onServerStart);
 
         LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractYTDLP);
+        LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractFFMPEG);
 
         InteractionEvent.RIGHT_CLICK_BLOCK.register(DisxAdvancedJukebox::leverListener);
 
