@@ -141,7 +141,7 @@ public class DisxEnderAdvancedJukebox extends Block{
                 String videoId = compoundTag.getString("videoId");
                 if (discName.equals("Video Not Found")){
                     DisxLogger.debug("Disc has no name. Attempting to find one...");
-                    String videoName = DisxYTDLPWrapper.getVideoName(videoId);
+                    String videoName = DisxYoutubeResolver.scrapeTitle(videoId);
                     if (!videoName.equals("Video Not Found")){
                         DisxLogger.debug("Found updated name: " + videoName);
                         compoundTag.putString("discName", videoName);

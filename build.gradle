@@ -38,68 +38,18 @@ allprojects {
     group = rootProject.maven_group
 
     repositories {
-        maven { url 'https://jitpack.io' }
 
         mavenCentral()
 
         maven {url 'https://mvnrepository.com/artifact/org.json/json'}
 
-        maven { url 'https://jitpack.io' }
-
-        maven { url 'https://mvnrepository.com/artifact/com.github.sealedtx/java-youtube-downloader'}
-
-        maven{ url "https://maven.arbjerg.dev/releases" }
-
-        maven{ url 'https://mvnrepository.com/artifact/org.jsoup/jsoup'}
-
-        maven{url "https://maven.lavalink.dev/releases"}
-
-        maven { url 'https://mvnrepository.com/artifact/com.grack/nanojson'}
-
-        maven { url 'https://mvnrepository.com/artifact/org.mozilla/rhino'}
     }
 
     dependencies{
-        //implementation 'dev.arbjerg:lavaplayer:2.0.2'
-        //implementation group: 'org.json', name: 'json', version: '20230618'
-        //implementation group: 'com.github.sealedtx', name: 'java-youtube-downloader', version: '3.2.3'
-        //implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
-        //implementation "dev.arbjerg:lavadsp:0.7.8"
 
-        implementation 'com.alibaba:fastjson:+'
-        implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
-        implementation 'com.fasterxml.jackson.core:jackson-core:2.17.2'
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
-        implementation 'com.github.walkyst.JAADec-fork:jaadec-ext-aac:+'
-        /*include 'com.github.walkyst:lavaplayer-fork:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lava-common:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lavaplayer:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lavaplayer-ext-format-xm:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lavaplayer-ext-youtube-rotator:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lavaplayer-stream-merger:1.4.3'
-        include 'com.github.walkyst.lavaplayer-fork:lavaplayer-test-samples:1.4.3'
-        include 'com.github.walkyst:ibxm-fork:a75'
-        include 'com.github.walkyst:lavaplayer-natives-fork:1.0.2'
-        */
-        implementation group: 'org.json', name: 'json', version: '20230618'
-        //implementation group: 'com.github.sealedtx', name: 'java-youtube-downloader', version: '3.2.3'
-        implementation 'org.junit.jupiter:junit-jupiter:+'
-        implementation 'org.junit.jupiter:junit-jupiter-api:+'
-        implementation 'org.junit.jupiter:junit-jupiter-engine:+'
-        implementation 'org.junit.jupiter:junit-jupiter-params:+'
-        implementation 'org.junit.platform:junit-platform-commons:+'
-        implementation 'org.junit.platform:junit-platform-engine:+'
-        implementation 'org.mozilla:rhino:+'
-        implementation 'org.mozilla:rhino-engine:+'
-        implementation 'org.opentest4j:opentest4j:+'
+        implementation group: 'org.json', name: 'json', version: '+'
 
-        implementation "dev.arbjerg:lavaplayer:+"
-        implementation "dev.lavalink.youtube:common:1.2.0"
-        implementation 'org.apache.httpcomponents:httpclient:+'
-        implementation 'commons-logging:commons-logging:+'
-        implementation group: 'com.grack', name: 'nanojson', version: '+'
 
-        implementation group: 'org.jsoup', name: 'jsoup', version: '1.16.2'
     }
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"

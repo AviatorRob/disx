@@ -1,12 +1,9 @@
 package xyz.ar06.disx.commands;
 
-import net.minecraft.ChatFormatting;
 import xyz.ar06.disx.DisxSystemMessages;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import xyz.ar06.disx.items.DisxRecordStamp;
-import xyz.ar06.disx.utils.DisxYTDLPWrapper;
-import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
-import xyz.ar06.disx.utils.DisxYoutubeTitleScraper;
+import xyz.ar06.disx.utils.DisxYoutubeResolver;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -58,7 +55,7 @@ public class DisxStampCommand {
             context.getSource().sendFailure(Component.translatable("sysmsg.disx.stampcmd.no_player_err"));
             throw new RuntimeException(e);
         }
-        ArrayList<String> title_and_length = DisxYTDLPWrapper.getTitleAndLength(videoId);
+        ArrayList<String> title_and_length = DisxYoutubeResolver.scrapeLengthAndTitle(videoId);
 
         if (title_and_length == null && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")) {
             if (context.getSource().isPlayer()){

@@ -1,7 +1,6 @@
 package xyz.ar06.disx.commands;
 
 import dev.architectury.platform.Platform;
-import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Style;
 import xyz.ar06.disx.DisxAudioStreamingNode;
@@ -272,46 +271,4 @@ public class DisxConfigCommand {
         return 1;
     }
 
-    private static int runGenRefreshToken(CommandContext<CommandSourceStack> context){
-        if (!context.getSource().hasPermission(1)){
-            context.getSource().sendFailure(Component.translatable("sysmsg.disx.cmd_no_permission"));
-        } else {
-            if (Platform.isForge()){
-                context.getSource().sendFailure(Component.literal("This feature is currently only available on Fabric and Quilt."));
-                return 1;
-            }
-            YoutubeAudioSourceManager youtubeAudioSourceManager = DisxAudioStreamingNode.getYoutubeAudioSourceManager();
-            String authCode = youtubeAudioSourceManager.getOauth2Handler().initializeAccessToken(context.getSource());
-            context.getSource().sendSystemMessage(Component.translatable("sysmsg.disx.configcmd.generaterefreshtokeninstructions")
-                    .withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
-            context.getSource().sendSystemMessage(Component.literal("https://www.google.com/device")
-                    .withStyle(Style.EMPTY.withClickEvent(
-                            new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/device")
-                    ))
-                    .withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BLUE)
-            );
-            context.getSource().sendSystemMessage(
-                    Component.translatable("sysmsg.disx.configcmd.generaterefreshtokencode")
-                            .append(Component.literal(authCode)
-                                    .withStyle(Style.EMPTY.withClickEvent(
-                                            new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, authCode)))
-                                    .withStyle(ChatFormatting.UNDERLINE)
-            ));
-        }
-        return 1;
-    }
-
-    private static int clearRefreshToken(CommandContext<CommandSourceStack> context){
-        if (!context.getSource().hasPermission(1)){
-            context.getSource().sendFailure(Component.translatable("sysmsg.disx.cmd_no_permission"));
-        } else {
-            if (Platform.isForge()){
-                context.getSource().sendFailure(Component.literal("This feature is currently only available on Fabric and Quilt."));
-                return 1;
-            }
-            DisxConfigHandler.SERVER.updateProperty("refresh_token","");
-            context.getSource().sendSystemMessage(Component.translatable("sysmsg.disx.configcmd.clearedrefreshtoken"));
-        }
-        return 1;
-    }
 }

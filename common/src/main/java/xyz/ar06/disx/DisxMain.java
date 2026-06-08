@@ -1,16 +1,10 @@
 package xyz.ar06.disx;
 
-import dev.architectury.event.events.client.ClientRecipeUpdateEvent;
 import dev.architectury.event.events.common.*;
-import dev.architectury.registry.fuel.FuelRegistry;
 import dev.architectury.utils.Env;
-import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import xyz.ar06.disx.blocks.*;
 import xyz.ar06.disx.client_only.DisxClientMain;
 import xyz.ar06.disx.commands.*;
@@ -38,9 +32,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class DisxMain {
@@ -141,16 +133,12 @@ public class DisxMain {
 
         //LifecycleEvent.SERVER_STARTED.register(DisxSystemMessages::forcingLiveYtSrc);
 
-        LifecycleEvent.SERVER_STARTED.register((server) -> {
-            if (DisxModInfo.isTESTTRACK()){
-                CompletableFuture.runAsync(() -> DisxLavaplayerTest.testTrack(server));
-            }
-        });
 
         LifecycleEvent.SERVER_STARTING.register(DisxTmpHandler::onServerStart);
 
-        LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractYTDLP);
-        LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractFFMPEG);
+
+        //LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractYTDLP);
+        //LifecycleEvent.SERVER_STARTED.register(DisxYTDLPWrapper::extractFFMPEG);
 
         InteractionEvent.RIGHT_CLICK_BLOCK.register(DisxAdvancedJukebox::leverListener);
 

@@ -1,44 +1,29 @@
 package xyz.ar06.disx;
 
-import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
-import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
-import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream;
-import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats;
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import dev.lavalink.youtube.YoutubeAudioSourceManager;
-import dev.lavalink.youtube.clients.*;
-import dev.lavalink.youtube.clients.skeleton.Client;
+
+import com.google.common.io.Files;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import org.apache.http.client.config.RequestConfig;
 import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
-import xyz.ar06.disx.utils.DisxYTDLPWrapper;
+import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class DisxAudioStreamingNode {
-    @Deprecated static AudioDataFormat LPformat = StandardAudioDataFormats.COMMON_PCM_S16_BE;
     private int bitDepth = 16;
     private int channelCount = 2;
     private int frameSize = (bitDepth / 8) * channelCount;
@@ -54,14 +39,10 @@ public class DisxAudioStreamingNode {
     );
 
 
-
-    @Deprecated private static DefaultAudioPlayerManager playerManager = new DefaultAudioPlayerManager();
-    @Deprecated private static final YoutubeAudioSourceManager youtubeAudioSourceManager = buildYoutubeAudioSourceManager();
     //@Deprecated private AudioPlayer audioPlayer = new DefaultAudioPlayer(playerManager);
     //private AudioInputStream inputStream = AudioPlayerInputStream.createStream(audioPlayer, LPformat, 20000, true);;
     private AudioInputStream inputStream;// = AudioPlayerInputStream.createStream(audioPlayer, LPformat, 20000, true);;
-
-    private byte[] audioDataCache;
+    private File audioFile;
 
     private BlockPos blockPos;
     private ResourceLocation dimension;
@@ -79,15 +60,6 @@ public class DisxAudioStreamingNode {
 
     private ArrayList<DisxAudioFilterType> activeFilters;
 
-    private static YoutubeAudioSourceManager buildYoutubeAudioSourceManager(){
-        ClientOptions clientOptions = new ClientOptions();
-        clientOptions.setVideoLoading(true);
-        clientOptions.setSearching(false);
-        clientOptions.setPlayback(true);
-        clientOptions.setPlaylistLoading(false);
-        Client[] clients = new Client[]{new Tv(clientOptions), new TvHtml5Embedded(clientOptions)};
-        return new YoutubeAudioSourceManager(false, clients);
-    }
 
     public DisxAudioStreamingNode(String videoId, BlockPos blockPos, ResourceLocation dimension, Player nodeOwner, boolean loop, int startTime, DisxAudioMotionType motionType, UUID entityUuid, int rogueRadius, ArrayList<DisxAudioFilterType> audioFilters){
         DisxLogger.debug("New Audio Streaming Node called for; setting details (MOTION TYPE: " + motionType.name() + "); Running Async!");
@@ -106,33 +78,68 @@ public class DisxAudioStreamingNode {
         CompletableFuture.runAsync(() -> {
             //DisxLogger.debug(this.useLiveYtSrc ? "Server is configured to use live YouTube source; setting load URL" : "Server is configured to use Disx-YTSRC-API; setting load URL");
             //String url = this.useLiveYtSrc ? "https://www.youtube.com/watch?v=" + videoId : "http://disxytsourceapi.ar06.xyz/stream_audio?id=" + videoId;
-            DisxLogger.debug("Calling YTDLP to download, cache, delete WHOLE audio file");
+
             try {
-                byte[] receivedData = DisxYTDLPWrapper.downloadToBuffer(videoId);
-            } catch (IOException | InterruptedException e) {
-                DisxSystemMessages.errorLoading(nodeOwner);
-                DisxLogger.error(e);
-            }
-            try {
-                byte[] receivedData = DisxYTDLPWrapper.downloadToBuffer(videoId);
-                DisxLogger.debug("YTDLP successfully returned data");
-                if (this.activeFilters.contains(DisxAudioFilterType.REVERSE)){
-                    DisxLogger.debug("REVERSE effect is active; Reversing audio data before creating cache");
-                    int wavHeaderSize = 44;
-                    int length = receivedData.length;
-                    int pcmLength = length - wavHeaderSize;
-                    byte[] temp = new byte[frameSize];
-                    for (int i = wavHeaderSize; i < pcmLength / 2; i += frameSize) {
-                        int j = length - frameSize - (i - wavHeaderSize);
-                        // swap frame at i with frame at j
-                        System.arraycopy(receivedData, i, temp, 0, frameSize);
-                        System.arraycopy(receivedData, j, receivedData, i, frameSize);
-                        System.arraycopy(temp, 0, receivedData, j, frameSize);
+                File audioFile = null;
+                if (!this.activeFilters.isEmpty()){
+                    DisxLogger.debug("Detected audio filters active; checking for already-processed audio");
+                    List<File> filesStream = java.nio.file.Files.list(Path.of(DisxTmpHandler.TMP_PROCESSED_CACHE_PATH))
+                            .map(path -> new File(path.toUri()))
+                            .toList();
+                    for (File file : filesStream){
+                        String fileName = file.getName();
+                        HashMap<DisxAudioFilterType, Boolean> matchedEffects = new HashMap<>();
+                        for (DisxAudioFilterType queriedFilter : this.activeFilters){
+                            if (fileName.contains("." + queriedFilter.name())){
+                                matchedEffects.put(queriedFilter, true);
+                            } else {
+                                matchedEffects.put(queriedFilter, false);
+                            }
+                        }
+                        if (!matchedEffects.containsValue(false)){
+                            DisxLogger.debug("Found cached processed file, using it");
+                            audioFile = file;
+                            Thread.sleep(1000);
+                            break;
+                        }
                     }
+                    if (audioFile == null){
+                        DisxLogger.debug("Did not find cached processed file, requesting regular version");
+                        File downloadFile = DisxYoutubeResolver.resolveFile(videoId);
+                        byte[] receivedData = Files.toByteArray(downloadFile);
+                        DisxLogger.debug("Beginning audio processing");
+                        if (this.activeFilters.contains(DisxAudioFilterType.REVERSE)){
+                            DisxLogger.debug("REVERSE effect is active; Reversing audio data before creating cache");
+                            int wavHeaderSize = 44;
+                            int length = receivedData.length;
+                            int pcmLength = length - wavHeaderSize;
+                            byte[] temp = new byte[frameSize];
+                            for (int i = wavHeaderSize; i < pcmLength / 2; i += frameSize) {
+                                int j = length - frameSize - (i - wavHeaderSize);
+                                // swap frame at i with frame at j
+                                System.arraycopy(receivedData, i, temp, 0, frameSize);
+                                System.arraycopy(receivedData, j, receivedData, i, frameSize);
+                                System.arraycopy(temp, 0, receivedData, j, frameSize);
+                            }
+                        }
+                        StringBuilder cachePathBuilder = new StringBuilder(DisxTmpHandler.TMP_PROCESSED_CACHE_PATH + "/"
+                                + videoId);
+                        for (DisxAudioFilterType filter : this.getActiveFilters()){
+                            cachePathBuilder.append(".").append(filter.name());
+                        }
+                        cachePathBuilder.append(".pcm.wav");
+                        File cacheFile = new File(cachePathBuilder.toString());
+                        Files.write(receivedData, cacheFile);
+                        DisxLogger.debug("Processing done; storing audio cache and passing to audio streamer");
+                        audioFile = cacheFile;
+                    }
+                } else {
+                    DisxLogger.debug("Requesting audio file from YT-SRC API");
+                    audioFile = DisxYoutubeResolver.resolveFile(videoId);
                 }
-                DisxLogger.debug("Storing audio cache");
-                this.audioDataCache = receivedData;
+                if (audioFile == null || !audioFile.exists()) throw new IOException("File does not exist");
                 DisxLogger.debug("Starting data stream loop");
+                this.audioFile = audioFile;
                 DisxAudioStreamingNode.this.streamAudioData();
             } catch (Exception e){
                 DisxLogger.error("Hit an error trying to load video audio!");
@@ -153,7 +160,7 @@ public class DisxAudioStreamingNode {
                 DisxServerPacketIndex.ServerPackets.playingVideoIdMessage(DisxAudioStreamingNode.this.videoId, DisxAudioStreamingNode.this.nodeOwner);
                 if (inputStream == null){
                     DisxLogger.debug("Input stream found null; making new one");
-                    this.inputStream = new AudioInputStream(new ByteArrayInputStream(audioDataCache), format, (audioDataCache.length / format.getFrameSize()));
+                    this.inputStream = new AudioInputStream(new FileInputStream(audioFile), format, (audioFile.length() / format.getFrameSize()));
                 }
                 int bytesRead;
                 while (inputStream != null && !this.isPaused()){
@@ -234,9 +241,9 @@ public class DisxAudioStreamingNode {
                 this.inputStream.close();
                 this.inputStream = null;
             }
-            if (this.audioDataCache != null){
+            if (this.audioFile != null){
                 //this.audioDataCache.close();
-                this.audioDataCache = null;
+                this.audioFile = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -276,18 +283,6 @@ public class DisxAudioStreamingNode {
         return this.paused;
     }
 
-    @Deprecated public static void initPlayerManager(MinecraftServer server){
-        DisxLogger.debug("Initializing audio player manager object");
-        playerManager.setHttpRequestConfigurator(requestConfig -> RequestConfig.copy(requestConfig)
-                .setSocketTimeout(20000)
-                .setConnectTimeout(20000)
-                .build()
-        );
-        playerManager.registerSourceManager(youtubeAudioSourceManager);
-        playerManager.registerSourceManager(new HttpAudioSourceManager(MediaContainerRegistry.DEFAULT_REGISTRY));
-        AudioSourceManagers.registerLocalSource(playerManager);
-        playerManager.getConfiguration().setOutputFormat(LPformat);
-    }
 
     public int incrementVolume(double amount){
         int currentVolume = this.preferredVolume;
@@ -322,70 +317,5 @@ public class DisxAudioStreamingNode {
 
     public ArrayList<DisxAudioFilterType> getActiveFilters() { return activeFilters; }
 
-    public static YoutubeAudioSourceManager getYoutubeAudioSourceManager() {
-        return youtubeAudioSourceManager;
-    }
-
-    public class TrackHandler extends AudioEventAdapter {
-        @Override
-        public void onTrackStart(AudioPlayer player, AudioTrack track) {
-            /*
-            DisxLogger.debug("Calling for now playing message packet to be sent");
-            DisxServerPacketIndex.ServerPackets.playingVideoIdMessage(DisxAudioStreamingNode.this.videoId, DisxAudioStreamingNode.this.nodeOwner);
-            DisxLogger.debug("Audio starting; registered audio data read and send loops");
-*/
-            super.onTrackStart(player, track);
-        }
-
-        @Override
-        public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-            if (exception.getMessage().equals("Please sign in")){
-                DisxLogger.debug("Oauth2 error detected; sending node owner message");
-                DisxSystemMessages.signInError((ServerPlayer) nodeOwner);
-            } else
-            if (exception.getCause().toString().equals("java.lang.RuntimeException: Not success status code: 403")){
-                DisxLogger.debug("Oauth2 error detected; sending node owner message");
-                DisxSystemMessages.status403Error((ServerPlayer) nodeOwner);
-            }
-            super.onTrackException(player, track, exception);
-        }
-
-        @Override
-        public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-            if (endReason.equals(AudioTrackEndReason.FINISHED)){
-                try {
-                    if (!loop){
-                        DisxLogger.debug("Audio input stream read reached end of audio; loop != true; closing audio input stream (live yt source)");
-                        inputStream.close();
-                        DisxAudioStreamingNode.this.inputStream = null;
-                    }
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            /*
-            if (loop && endReason.equals(AudioTrackEndReason.FINISHED)){
-                DisxLogger.debug("Track finished, loop = true; replaying track");
-                AudioTrack toLoop = cachedTrack.makeClone();
-                player.playTrack(toLoop);
-            } else if (endReason.equals(AudioTrackEndReason.FINISHED)){
-                    DisxLogger.debug("Track finished, loop != true; unregistering send audio data loop and deregistering node in 6 second delay");
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            Thread.sleep(6000);
-                            DisxLogger.debug("6 second finish window is closed; deregistering audio node");
-                            DisxServerAudioRegistry.removeFromRegistry(DisxAudioStreamingNode.this);
-                        } catch (Exception e) {
-                            DisxLogger.error("Failed to remove DisxAudioStreamingNode from server registry:");
-                            e.printStackTrace();
-                        }
-
-                    });
-            }
-             */
-            super.onTrackEnd(player, track, endReason);
-        }
-    }
 
 }

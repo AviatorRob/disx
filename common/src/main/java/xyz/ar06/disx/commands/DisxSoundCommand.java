@@ -6,7 +6,6 @@ import xyz.ar06.disx.DisxLogger;
 import xyz.ar06.disx.utils.DisxInternetCheck;
 import xyz.ar06.disx.DisxServerAudioRegistry;
 import xyz.ar06.disx.DisxSystemMessages;
-import xyz.ar06.disx.utils.DisxYTDLPWrapper;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -20,6 +19,7 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -88,7 +88,7 @@ public class DisxSoundCommand {
             if (DisxServerAudioRegistry.isNodeAtLocation(blockPos, dimension)){
                 throw new Exception("Audio At Location");
             }
-            int videoLength = DisxYTDLPWrapper.getVideoLength(videoId);
+            int videoLength = DisxYoutubeResolver.scrapeLengthInSeconds(videoId);
             if (videoLength == -1 && DisxConfigHandler.SERVER.getProperty("video_existence_check").equals("true")){
                 throw new Exception("Video Not Found");
             }

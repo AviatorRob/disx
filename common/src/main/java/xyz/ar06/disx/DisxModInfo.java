@@ -20,7 +20,6 @@ public class DisxModInfo {
             "skibidi gooning",
             "uninstall brainrot.exe"
     };
-    private static final boolean TEST_TRACK_ENABLED = false;
 
     //URLS
     private static final String DISCORD_URL = "http://discord.ar06.xyz";
@@ -194,10 +193,6 @@ public class DisxModInfo {
         return (FORCE_DEBUG || DEBUG);
     }
 
-    public static boolean isTESTTRACK() {
-        return TEST_TRACK_ENABLED;
-    }
-
     public static void setDEBUG(boolean DEBUG) {
         DisxModInfo.DEBUG = DEBUG;
     }
@@ -224,13 +219,6 @@ public class DisxModInfo {
 
     @Deprecated public static void setRefreshToken(String refreshToken) {
         REFRESH_TOKEN = refreshToken;
-        if (REFRESH_TOKEN != null && !REFRESH_TOKEN.isEmpty()){
-            try {
-                DisxAudioStreamingNode.getYoutubeAudioSourceManager().useOauth2(refreshToken, true);
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }
     }
 
     public static int getAudioRadius() {

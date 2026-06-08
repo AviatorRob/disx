@@ -1,51 +1,34 @@
 package xyz.ar06.disx.entities.vehicle;
 
 
-import dev.architectury.event.EventResult;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MinecartItem;
-import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseRailBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.RailShape;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import xyz.ar06.disx.*;
 import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
@@ -54,11 +37,9 @@ import xyz.ar06.disx.client_only.DisxAudioInstanceRegistry;
 import xyz.ar06.disx.client_only.DisxConfigRecordS2C;
 import xyz.ar06.disx.items.DisxAdvancedJukeboxMinecartItem;
 import xyz.ar06.disx.items.DisxCustomDisc;
-import xyz.ar06.disx.utils.DisxYTDLPWrapper;
-import xyz.ar06.disx.utils.DisxYoutubeInfoScraper;
+import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 public class DisxAdvancedJukeboxMinecart extends Minecart implements ContainerEntity {
@@ -256,7 +237,7 @@ public class DisxAdvancedJukeboxMinecart extends Minecart implements ContainerEn
             String videoId = compoundTag.getString("videoId");
             if (discName.equals("Video Not Found")){
                 DisxLogger.debug("Disc has no name. Attempting to find one...");
-                String videoName = DisxYTDLPWrapper.getVideoName(videoId);
+                String videoName = DisxYoutubeResolver.scrapeTitle(videoId);
                 if (!videoName.equals("Video Not Found")){
                     DisxLogger.debug("Found updated name: " + videoName);
                     compoundTag.putString("discName", videoName);
