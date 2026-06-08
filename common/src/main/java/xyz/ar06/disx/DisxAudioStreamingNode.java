@@ -99,6 +99,7 @@ public class DisxAudioStreamingNode {
                         if (!matchedEffects.containsValue(false)){
                             DisxLogger.debug("Found cached processed file, using it");
                             audioFile = file;
+                            DisxTmpHandler.markAudioUsed(file);
                             Thread.sleep(1000);
                             break;
                         }
@@ -134,7 +135,7 @@ public class DisxAudioStreamingNode {
                         audioFile = cacheFile;
                     }
                 } else {
-                    DisxLogger.debug("Requesting audio file from YT-SRC API");
+                    DisxLogger.debug("Requesting audio file from resolver");
                     audioFile = DisxYoutubeResolver.resolveFile(videoId);
                 }
                 if (audioFile == null || !audioFile.exists()) throw new IOException("File does not exist");

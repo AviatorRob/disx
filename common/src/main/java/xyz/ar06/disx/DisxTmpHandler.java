@@ -7,9 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DisxTmpHandler {
@@ -20,14 +20,13 @@ public class DisxTmpHandler {
     public static void onServerStart(MinecraftServer minecraftServer){
         File dir = new File(TMP_PATH);
         Path path = Path.of(TMP_PATH);
-        if (dir.exists()){
-            DisxLogger.debug("Server start detected; tmp directory already exists, clearing it");
-            clearTempPath();
+        if (!dir.exists()){
+            DisxLogger.debug("Server start detected; tmp directory does not exist; initializing it");
+            initTempPath();
         }
-        DisxLogger.debug("Initializing tmp directory");
-        initTempPath();
+
         DisxLogger.debug("Registering temp-file handling loops");
-        TickEvent.ServerLevelTick.SERVER_POST.register(DisxTmpHandler::cacheTTLHandler);
+        //TickEvent.ServerLevelTick.SERVER_POST.register(DisxTmpHandler::cacheTTLHandler);
         TickEvent.ServerLevelTick.SERVER_POST.register(DisxTmpHandler::cacheMaxCapacityHandler);
     }
 
@@ -62,45 +61,33 @@ public class DisxTmpHandler {
         }
     }
 
-    private static void clearCache(){
-        try {
-            Path path = Path.of(TMP_CACHE_PATH);
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file); // Delete each file
-                    return FileVisitResult.CONTINUE;
-                }
+    public static void markAudioUsed(File audioFile){
+        audioFile.setLastModified(System.currentTimeMillis());
+    }
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir); // Delete directory after files inside are gone
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private static void cleanCache(long cacheSize){
+        File[] files = new File(TMP_CACHE_PATH).listFiles();
+
+        Arrays.sort(files,
+                Comparator.comparingLong(File::lastModified));
+
+        for (File f : files) {
+            if (cacheSize <= MAX_CACHE_SIZE) break;
+            cacheSize -= f.length();
+            f.delete();
         }
     }
 
-    private static void clearProcessedCache(){
-        try {
-            Path path = Path.of(TMP_PROCESSED_CACHE_PATH);
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file); // Delete each file
-                    return FileVisitResult.CONTINUE;
-                }
+    private static void cleanProcessedCache(long cacheSize){
+        File[] files = new File(TMP_PROCESSED_CACHE_PATH).listFiles();
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir); // Delete directory after files inside are gone
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Arrays.sort(files,
+                Comparator.comparingLong(File::lastModified));
+
+        for (File f : files) {
+            if (cacheSize <= MAX_CACHE_SIZE) break;
+            cacheSize -= f.length();
+            f.delete();
         }
     }
 
@@ -143,9 +130,9 @@ public class DisxTmpHandler {
         }
     }
 
+    private static long MAX_CACHE_SIZE = 5L * 1024 * 1024 * 1024;
     public static void cacheMaxCapacityHandler(MinecraftServer minecraftServer) {
         try {
-            long maxSize = 5L * 1024 * 1024 * 1024;
             long totalBytes;
             if (new File(TMP_CACHE_PATH).exists()){
                 Stream<Path> files = Files.list(Path.of(TMP_CACHE_PATH));
@@ -159,9 +146,9 @@ public class DisxTmpHandler {
                             }
                         })
                         .sum();
-                if (totalBytes >= maxSize){
-                    DisxLogger.debug("Audio cache reached 5 GB threshold- clearing cache");
-                    clearCache();
+                if (totalBytes >= MAX_CACHE_SIZE){
+                    DisxLogger.debug("Audio cache reached 5 GB threshold- cleaning cache");
+                    cleanCache(totalBytes);
                 }
             }
             if (new File(TMP_PROCESSED_CACHE_PATH).exists()){
@@ -176,9 +163,9 @@ public class DisxTmpHandler {
                             }
                         })
                         .sum();
-                if (totalBytes >= maxSize){
-                    DisxLogger.debug("Audio cache reached 5 GB threshold- clearing cache");
-                    clearProcessedCache();
+                if (totalBytes >= MAX_CACHE_SIZE){
+                    DisxLogger.debug("Processed audio cache reached 5 GB threshold- cleaning cache");
+                    cleanProcessedCache(totalBytes);
                 }
             }
 

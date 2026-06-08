@@ -33,23 +33,8 @@ repositories {
 
     maven {url 'https://mvnrepository.com/artifact/org.json/json'}
 
-    maven { url 'https://mvnrepository.com/artifact/com.github.sealedtx/java-youtube-downloader'}
-
-    maven{ url "https://maven.arbjerg.dev/releases" }
-
-    maven{url "https://maven.lavalink.dev/releases"}
-
     maven { url "https://maven.shedaniel.me" }
 
-    maven { url 'https://mvnrepository.com/artifact/com.grack/nanojson'}
-
-    maven { url 'https://mvnrepository.com/artifact/org.mozilla/rhino'}
-
-    maven { url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations'}
-
-    maven { url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core'}
-
-    maven { url 'https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind'}
 
 }
 
@@ -63,6 +48,10 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:${rootProject.forge_REI_version}"
+
+    implementation group: 'org.json', name: 'json', version: '+'
+    forgeRuntimeLibrary(group: 'org.json', name: 'json', version: '+')
+    shadowDependencies(group: 'org.json', name: 'json', version: '+')
 }
 
 processResources {
@@ -81,6 +70,10 @@ shadowJar {
     configurations = [project.configurations.shadowCommon, project.configurations.shadowDependencies]
 
     archiveClassifier = "dev-shadow"
+
+
+
+    relocate 'org.json', 'disxshadowed.org.json'
 
 }
 

@@ -22,12 +22,13 @@ public class DisxYoutubeResolver {
     public static File resolveFile(String videoId){
         String apiURL = "http://disxytsourceapi.ar06.xyz/audio_pcm?id=";
         try {
-            DisxLogger.debug("Audio file resolve requested. Check/creating tmp directories");
-            DisxLogger.debug("tmp directories in place- checking for if requested video is cached");
+            DisxLogger.debug("Audio file resolve requested. Checking tmp directory caches");
             File returnFile = new File("./.disx-tmp/cache/" + videoId + ".pcm.wav");
             if (returnFile.exists()){
                 Thread.sleep(1000); //sleep for a second to ensure most clients got their audio lines ready for data streaming
                                             //only because the sleep needs to happen when the audio is loaded from cached
+                DisxLogger.debug("Found cached audio file. Returning");
+                DisxTmpHandler.markAudioUsed(returnFile);
                 return returnFile;
             }
             DisxLogger.debug("Did not find in cache. Requesting from YT-SRC API");
