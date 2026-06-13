@@ -107,6 +107,7 @@ public class DisxTmpHandler {
                         file.delete();
                     }
                 }
+                filesStream.stream().close();
             }
 
             if (new File(TMP_PROCESSED_CACHE_PATH).exists()){
@@ -123,6 +124,7 @@ public class DisxTmpHandler {
                         file.delete();
                     }
                 }
+                filesStream.stream().close();
             }
 
         } catch (IOException e) {
@@ -146,10 +148,12 @@ public class DisxTmpHandler {
                             }
                         })
                         .sum();
+                files.close();
                 if (totalBytes >= MAX_CACHE_SIZE){
                     DisxLogger.debug("Audio cache reached 5 GB threshold- cleaning cache");
                     cleanCache(totalBytes);
                 }
+
             }
             if (new File(TMP_PROCESSED_CACHE_PATH).exists()){
                 Stream<Path> files = Files.list(Path.of(TMP_PROCESSED_CACHE_PATH));
@@ -163,6 +167,7 @@ public class DisxTmpHandler {
                             }
                         })
                         .sum();
+                files.close();
                 if (totalBytes >= MAX_CACHE_SIZE){
                     DisxLogger.debug("Processed audio cache reached 5 GB threshold- cleaning cache");
                     cleanProcessedCache(totalBytes);

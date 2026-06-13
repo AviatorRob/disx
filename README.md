@@ -26,10 +26,3 @@ Credit to the primary libraries used in this project:
 
 [Architectury API](https://github.com/architectury/architectury-api)
 
-[Lavaplayer](https://github.com/lavalink-devs/lavaplayer)
-
-[Jsoup](https://github.com/jhy/jsoup)
-
-[Mozilla Rhino](https://github.com/mozilla/rhino)
-
-
