@@ -8,6 +8,7 @@ import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
 import xyz.ar06.disx.blocks.DisxLacquerBlock;
 import xyz.ar06.disx.items.DisxLacquerDrop;
+import xyz.ar06.disx.utils.DisxEnderAdvancedJukeboxInventoryHelper;
 
 public class DisxMainQuilt implements ModInitializer {
 
@@ -17,15 +18,14 @@ public class DisxMainQuilt implements ModInitializer {
         FuelRegistry.register(100, DisxLacquerDrop.itemRegistration.get());
         FuelRegistry.register(900, DisxLacquerBlock.itemRegistration.get());
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
-            CompoundTag oldTag = new CompoundTag();
-            oldPlayer.addAdditionalSaveData(oldTag);
 
-            CompoundTag enderAdvancedJukeboxTag = oldTag.getCompound("EnderAdvancedJukeboxInventory.disx");
 
-            CompoundTag newTag = new CompoundTag();
-            newTag.put("EnderAdvancedJukeboxInventory.disx", enderAdvancedJukeboxTag.copy());
-
-            newPlayer.readAdditionalSaveData(newTag);
+            if (oldPlayer instanceof DisxEnderAdvancedJukeboxInventoryHelper helper){
+                CompoundTag enderAdvancedJukeboxTag = helper.disx$getEnderAdvancedJukeboxInventory();
+                if (newPlayer instanceof DisxEnderAdvancedJukeboxInventoryHelper helperNew){
+                    helperNew.disx$setEnderAdvancedJukeboxInventory(enderAdvancedJukeboxTag);
+                }
+            }
         });
         DisxClientMainQuilt.initializeClient();
     }
