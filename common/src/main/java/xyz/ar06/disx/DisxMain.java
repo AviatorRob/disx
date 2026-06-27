@@ -10,6 +10,7 @@ import xyz.ar06.disx.client_only.DisxClientMain;
 import xyz.ar06.disx.commands.*;
 import xyz.ar06.disx.config.DisxConfigHandler;
 import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
+import xyz.ar06.disx.enchantments.DisxTempoEnchantment;
 import xyz.ar06.disx.entities.DisxAdvancedJukeboxEntity;
 import xyz.ar06.disx.entities.vehicle.DisxAdvancedJukeboxMinecart;
 import xyz.ar06.disx.items.*;
@@ -94,11 +95,13 @@ public class DisxMain {
         DisxSoundEvents.registerAdvancedJukeboxStatic(soundEventRegistrar);
         //Entity Registration Calls
         DisxAdvancedJukeboxMinecart.registerEntityType(entityTypeRegistrar);
+        //Enchantment Registration Calls
+        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+        DisxTempoEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
 
         //Pull Mod Info
         DisxModInfo.pullLatestVersion();
 
-        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
 
         //Fuel Registrations done in individual client loaders
 

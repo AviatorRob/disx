@@ -1,7 +1,7 @@
 package xyz.ar06.disx.audio_filters;
 
 public enum DisxAudioFilterType {
-    SPEED,
+    TEMPO,
     PITCH,
     REVERB,
     LOWPASS,

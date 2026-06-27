@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
+import xyz.ar06.disx.enchantments.DisxTempoEnchantment;
 import xyz.ar06.disx.items.DisxCustomDisc;
 import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
@@ -97,6 +98,9 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
 
             if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
                 audioFilters.add(DisxAudioFilterType.REVERSE);
+            }
+            if (EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+                audioFilters.add(DisxAudioFilterType.TEMPO);
             }
 
             DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, null, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
