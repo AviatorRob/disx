@@ -16,6 +16,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,11 +112,12 @@ public class DisxAudioStreamingNode {
                         File downloadFile = DisxYoutubeResolver.resolveFile(videoId);
                         byte[] receivedData = Files.toByteArray(downloadFile);
                         DisxLogger.debug("Beginning audio processing");
+                        int wavHeaderSize = 44;
+                        int length = receivedData.length;
+                        int pcmLength = length - wavHeaderSize;
+                        int channels = 2;
                         if (this.activeFilters.contains(DisxAudioFilterType.REVERSE)){
                             DisxLogger.debug("REVERSE effect is active; Reversing audio data before creating cache");
-                            int wavHeaderSize = 44;
-                            int length = receivedData.length;
-                            int pcmLength = length - wavHeaderSize;
                             byte[] temp = new byte[frameSize];
                             for (int i = wavHeaderSize; i < pcmLength / 2; i += frameSize) {
                                 int j = length - frameSize - (i - wavHeaderSize);
@@ -122,6 +126,48 @@ public class DisxAudioStreamingNode {
                                 System.arraycopy(receivedData, j, receivedData, i, frameSize);
                                 System.arraycopy(temp, 0, receivedData, j, frameSize);
                             }
+                        }
+                        if (this.activeFilters.contains(DisxAudioFilterType.TEMPO)){
+                            DisxLogger.debug("TEMPO effect is active; Speeding up audio data before creating cache");
+                            double speed = 1.5;
+                            ShortBuffer shortBuffer = ByteBuffer.wrap(receivedData)
+                                    .order(ByteOrder.BIG_ENDIAN)
+                                    .asShortBuffer();
+
+                            short[] samples = new short[shortBuffer.remaining()];
+                            shortBuffer.get(samples);
+
+                            int inputFrames = samples.length / channels;
+                            int outputFrames = (int) (inputFrames / speed);
+
+                            short[] output = new short[outputFrames * channels];
+
+                            double framePos = 0.0;
+
+                            for (int outFrame = 0; outFrame < outputFrames; outFrame++) {
+                                int frame1 = (int) framePos;
+                                int frame2 = Math.min(frame1 + 1, inputFrames - 1);
+                                double frac = framePos - frame1;
+
+                                for (int ch = 0; ch < channels; ch++) {
+                                    short a = samples[frame1 * channels + ch];
+                                    short b = samples[frame2 * channels + ch];
+
+                                    output[outFrame * channels + ch] =
+                                            (short) (a + frac * (b - a));
+                                }
+
+                                framePos += speed;
+                            }
+
+                            // Convert short[] -> byte[]
+                            ByteBuffer out = ByteBuffer.allocate(output.length * 2)
+                                    .order(ByteOrder.BIG_ENDIAN);
+
+                            for (short sample : output) {
+                                out.putShort(sample);
+                            }
+                            receivedData = out.array();
                         }
                         StringBuilder cachePathBuilder = new StringBuilder(DisxTmpHandler.TMP_PROCESSED_CACHE_PATH + "/"
                                 + videoId);

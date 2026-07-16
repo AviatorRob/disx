@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -55,16 +56,16 @@ public class DisxRetrogradeCurseEnchantment extends Enchantment {
         return (itemStack.getItem() instanceof DisxCustomDisc);
     }
 
-    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab){
+    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab, Registrar<Item> itemsRegistrar){
         enchantmentRegistration = enchantmentRegistrar.register(
                 new ResourceLocation("disx","retrograde_curse"),
                 () -> new DisxRetrogradeCurseEnchantment(Rarity.COMMON, EnchantmentCategory.FISHING_ROD, new EquipmentSlot[]{})
         );
-        /*CreativeTabRegistry.appendBuiltinStack(
+        CreativeTabRegistry.appendBuiltinStack(
                 creativeModeTab.get(),
                 EnchantedBookItem.createForEnchantment(
                         new EnchantmentInstance(enchantmentRegistration.get(), 1))
-        );*/
+        );
     }
 
 

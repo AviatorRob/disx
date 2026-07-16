@@ -98,8 +98,10 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
 
             if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
                 audioFilters.add(DisxAudioFilterType.REVERSE);
+                DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
             }
             if (EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+                DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
                 audioFilters.add(DisxAudioFilterType.TEMPO);
             }
 
@@ -121,6 +123,11 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
 
             if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
                 audioFilters.add(DisxAudioFilterType.REVERSE);
+                DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
+            }
+            if (EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+                DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
+                audioFilters.add(DisxAudioFilterType.TEMPO);
             }
 
             DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, player, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);

@@ -96,8 +96,8 @@ public class DisxMain {
         //Entity Registration Calls
         DisxAdvancedJukeboxMinecart.registerEntityType(entityTypeRegistrar);
         //Enchantment Registration Calls
-        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
-        DisxTempoEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab, itemsRegistrar);
+        DisxTempoEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab, itemsRegistrar);
 
         //Pull Mod Info
         DisxModInfo.pullLatestVersion();

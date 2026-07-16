@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class DisxYoutubeResolver {
     public static File resolveFile(String videoId){
-        String apiURL = "http://disxytsourceapi.ar06.xyz/audio_pcm?id=";
+        String apiURL = "https://disxytsourceapi.ar06.xyz/audio_pcm?id=";
         try {
             DisxLogger.debug("Audio file resolve requested. Checking tmp directory caches");
             File returnFile = new File("./.disx-tmp/cache/" + videoId + ".pcm.wav");
@@ -58,7 +58,7 @@ public class DisxYoutubeResolver {
     }
 
     public static String scrapeTitle(String videoId){
-        String apiURL = "http://disxytsourceapi.ar06.xyz/video_info";
+        String apiURL = "https://disxytsourceapi.ar06.xyz/video_info";
         try {
             String finalizedUrl = apiURL + "?id=" + videoId + "&get=title";
             HttpClient httpClient = HttpClient.newHttpClient();
@@ -82,7 +82,7 @@ public class DisxYoutubeResolver {
     }
 
     public static int scrapeLengthInSeconds(String videoId){
-        String apiURL = "http://disxytsourceapi.ar06.xyz/video_info";
+        String apiURL = "https://disxytsourceapi.ar06.xyz/video_info";
         try {
             String finalizedUrl = apiURL + "?id=" + videoId + "&get=length";
             HttpClient httpClient = HttpClient.newHttpClient();
@@ -106,7 +106,7 @@ public class DisxYoutubeResolver {
     }
 
     public static ArrayList<String> scrapeLengthAndTitle(String videoId){
-        String apiURL = "http://disxytsourceapi.ar06.xyz/video_info";
+        String apiURL = "https://disxytsourceapi.ar06.xyz/video_info";
         try {
             String finalizedUrl = apiURL + "?id=" + videoId;
             HttpClient httpClient = HttpClient.newHttpClient();

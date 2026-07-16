@@ -25,11 +25,8 @@ public class DisxAnvilMixin {
 
         if ((left.getItem() instanceof DisxCustomDisc)){
             if (right.getItem() instanceof EnchantedBookItem enchantedBook){
-                System.out.println(right.getOrCreateTag());
                 if (right.getOrCreateTag().contains("StoredEnchantments")) {
-                    System.out.println("check 1");
                     CompoundTag stackTag = right.getOrCreateTag();
-                    System.out.println(stackTag.getTagType("StoredEnchantments"));
                     ListTag enchantments = stackTag.getList("StoredEnchantments", Tag.TAG_COMPOUND);
                     for (Tag tag : enchantments){
                         if (tag instanceof CompoundTag compoundTag){
