@@ -30,16 +30,36 @@ public class DisxTempoEnchantment extends Enchantment {
                 EnchantedBookItem.createForEnchantment(
                         new EnchantmentInstance(enchantmentRegistration.get(), 1))
         );
+        CreativeTabRegistry.appendBuiltinStack(
+                creativeModeTab.get(),
+                EnchantedBookItem.createForEnchantment(
+                        new EnchantmentInstance(enchantmentRegistration.get(), 2))
+        );
+        CreativeTabRegistry.appendBuiltinStack(
+                creativeModeTab.get(),
+                EnchantedBookItem.createForEnchantment(
+                        new EnchantmentInstance(enchantmentRegistration.get(), 3))
+        );
     }
 
     @Override
     public int getMinCost(int i) {
-        return 1;
+        return 10 + (i - 1) * 15;
     }
 
     @Override
     public int getMaxCost(int i) {
-        return 15;
+        return getMinCost(i) + 5;
+    }
+
+    @Override
+    public int getMinLevel() {
+        return 1;
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return 3;
     }
 
     @Override

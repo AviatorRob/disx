@@ -127,9 +127,18 @@ public class DisxAudioStreamingNode {
                                 System.arraycopy(temp, 0, receivedData, j, frameSize);
                             }
                         }
-                        if (this.activeFilters.contains(DisxAudioFilterType.TEMPO)){
+                        if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_2) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
                             DisxLogger.debug("TEMPO effect is active; Speeding up audio data before creating cache");
-                            double speed = 1.5;
+                            double speed = 1;
+                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1)){
+                                speed = 1.25;
+                            }
+                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_2)){
+                                speed = 1.5;
+                            }
+                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
+                                speed = 2;
+                            }
                             ShortBuffer shortBuffer = ByteBuffer.wrap(receivedData)
                                     .order(ByteOrder.BIG_ENDIAN)
                                     .asShortBuffer();

@@ -100,9 +100,14 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
                 audioFilters.add(DisxAudioFilterType.REVERSE);
                 DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
             }
-            if (EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+            int tempoEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack);
+            if (tempoEnchantmentLevel > 0){
                 DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
-                audioFilters.add(DisxAudioFilterType.TEMPO);
+                switch (tempoEnchantmentLevel){
+                    case 1 -> audioFilters.add(DisxAudioFilterType.TEMPO_1);
+                    case 2 -> audioFilters.add(DisxAudioFilterType.TEMPO_2);
+                    case 3 -> audioFilters.add(DisxAudioFilterType.TEMPO_3);
+                };
             }
 
             DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, null, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
@@ -125,9 +130,14 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
                 audioFilters.add(DisxAudioFilterType.REVERSE);
                 DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
             }
-            if (EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack) > 0){
+            int tempoEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack);
+            if (tempoEnchantmentLevel > 0){
                 DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
-                audioFilters.add(DisxAudioFilterType.TEMPO);
+                switch (tempoEnchantmentLevel){
+                    case 1 -> audioFilters.add(DisxAudioFilterType.TEMPO_1);
+                    case 2 -> audioFilters.add(DisxAudioFilterType.TEMPO_2);
+                    case 3 -> audioFilters.add(DisxAudioFilterType.TEMPO_3);
+                };
             }
 
             DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, player, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
