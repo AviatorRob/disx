@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import xyz.ar06.disx.DisxAudioFormatConstants;
 import xyz.ar06.disx.DisxAudioMotionType;
 import xyz.ar06.disx.DisxLogger;
 
@@ -22,20 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class DisxAudioInstance {
-    public static int bitDepth = 16;
-    public static int channelCount = 2;
-    public static int frameSize = (bitDepth / 8) * channelCount;
-    public static int sampleRate = 48000;
-    public static double streamInterval = 5;
-    public static int chunkSize = (int) (sampleRate * frameSize * streamInterval); //(calculates to 882000)
-    public AudioFormat audioFormat = new AudioFormat(
-            sampleRate,
-            bitDepth,       // sample size in bits
-            channelCount,        // channels
-            true,     // signed
-            true      // big-endian
-    );
-
     private BlockPos blockPos;
     private ResourceLocation dimension;
     private UUID instanceOwner;
@@ -117,16 +104,16 @@ public class DisxAudioInstance {
                 Mixer.Info[] mixers = AudioSystem.getMixerInfo();
                 for (Mixer.Info mixerInfo : mixers) {
                     if (mixerInfo.getName().equals(preferredDeviceName)) {
-                        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+                        DataLine.Info info = new DataLine.Info(SourceDataLine.class, DisxAudioFormatConstants.format);
                         Mixer mixer = AudioSystem.getMixer(mixerInfo);
                         resultLine = (SourceDataLine) mixer.getLine(info);
-                        resultLine.open(audioFormat);
+                        resultLine.open(DisxAudioFormatConstants.format);
                     }
                 }
             } else {
                 DisxLogger.debug("Preferred audio device is not selected; using system default");
-                resultLine = AudioSystem.getSourceDataLine(audioFormat);
-                resultLine.open(audioFormat);
+                resultLine = AudioSystem.getSourceDataLine(DisxAudioFormatConstants.format);
+                resultLine.open(DisxAudioFormatConstants.format);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,7 +159,7 @@ public class DisxAudioInstance {
                 if (!this.audioLine.isOpen()){
                     try {
                         DisxLogger.debug("Audio Line not opened, opening...");
-                        this.audioLine.open(audioFormat);
+                        this.audioLine.open(DisxAudioFormatConstants.format);
                     } catch (LineUnavailableException e) {
                         e.printStackTrace();
                     }

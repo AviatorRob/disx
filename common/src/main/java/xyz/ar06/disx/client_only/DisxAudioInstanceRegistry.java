@@ -1,13 +1,10 @@
 package xyz.ar06.disx.client_only;
 
 import io.netty.buffer.ByteBuf;
-import xyz.ar06.disx.DisxAudioMotionType;
-import xyz.ar06.disx.DisxAudioStreamingNode;
-import xyz.ar06.disx.DisxLogger;
+import xyz.ar06.disx.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import xyz.ar06.disx.DisxSystemMessages;
 
 import java.util.*;
 
@@ -145,7 +142,7 @@ public class DisxAudioInstanceRegistry {
             if (motionType.equals(DisxAudioMotionType.STATIC)){
                 for (DisxAudioInstance instance : registry){
                     if (instance.getBlockPos().equals(blockPos) && instance.getDimension().equals(dimension) && instance.getMotionType().equals(DisxAudioMotionType.STATIC)){
-                        byte[] audioData = new byte[DisxAudioInstance.chunkSize];
+                        byte[] audioData = new byte[DisxAudioFormatConstants.chunkSize];
                         buf.readBytes(audioData);
                         instance.addToPacketDataQueue(audioData);
                         break;
@@ -154,7 +151,7 @@ public class DisxAudioInstanceRegistry {
             } else {
                 for (DisxAudioInstance instance : registry){
                     if (instance.getEntityUuid().equals(entityUuid) && instance.getMotionType().equals(DisxAudioMotionType.LIVE)){
-                        byte[] audioData = new byte[DisxAudioInstance.chunkSize];
+                        byte[] audioData = new byte[DisxAudioFormatConstants.chunkSize];
                         buf.readBytes(audioData);
                         instance.addToPacketDataQueue(audioData);
                         break;

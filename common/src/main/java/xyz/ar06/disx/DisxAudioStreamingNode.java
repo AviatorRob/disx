@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
+import xyz.ar06.disx.audio_filters.*;
 import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
 import javax.sound.sampled.AudioFormat;
@@ -26,22 +26,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static xyz.ar06.disx.DisxAudioFormatConstants.*;
+
 public class DisxAudioStreamingNode {
-    private int bitDepth = 16;
-    private int channelCount = 2;
-    private int frameSize = (bitDepth / 8) * channelCount;
-    private int sampleRate = 48000;
-    private static double streamInterval = 5;
-    private int chunkSize = (int) (sampleRate * frameSize * streamInterval); //(calculates to 882000)
-    public AudioFormat format = new AudioFormat(
-            sampleRate,
-            bitDepth,       // sample size in bits
-            channelCount,        // channels
-            true,     // signed
-            true      // big-endian
-    );
-
-
     //@Deprecated private AudioPlayer audioPlayer = new DefaultAudioPlayer(playerManager);
     //private AudioInputStream inputStream = AudioPlayerInputStream.createStream(audioPlayer, LPformat, 20000, true);;
     private AudioInputStream inputStream;// = AudioPlayerInputStream.createStream(audioPlayer, LPformat, 20000, true);;
@@ -112,71 +99,23 @@ public class DisxAudioStreamingNode {
                         File downloadFile = DisxYoutubeResolver.resolveFile(videoId);
                         byte[] receivedData = Files.toByteArray(downloadFile);
                         DisxLogger.debug("Beginning audio processing");
-                        int wavHeaderSize = 44;
-                        int length = receivedData.length;
-                        int pcmLength = length - wavHeaderSize;
+
                         int channels = 2;
                         if (this.activeFilters.contains(DisxAudioFilterType.REVERSE)){
                             DisxLogger.debug("REVERSE effect is active; Reversing audio data before creating cache");
-                            byte[] temp = new byte[frameSize];
-                            for (int i = wavHeaderSize; i < pcmLength / 2; i += frameSize) {
-                                int j = length - frameSize - (i - wavHeaderSize);
-                                // swap frame at i with frame at j
-                                System.arraycopy(receivedData, i, temp, 0, frameSize);
-                                System.arraycopy(receivedData, j, receivedData, i, frameSize);
-                                System.arraycopy(temp, 0, receivedData, j, frameSize);
-                            }
+                            receivedData = new DisxReverseFilter().process(receivedData);
                         }
                         if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_2) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
                             DisxLogger.debug("TEMPO effect is active; Speeding up audio data before creating cache");
-                            double speed = 1;
                             if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1)){
-                                speed = 1.25;
+                                receivedData = new DisxTempo1Filter().process(receivedData);
                             }
                             if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_2)){
-                                speed = 1.5;
+                                receivedData = new DisxTempo2Filter().process(receivedData);
                             }
                             if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
-                                speed = 2;
+                                receivedData = new DisxTempo3Filter().process(receivedData);
                             }
-                            ShortBuffer shortBuffer = ByteBuffer.wrap(receivedData)
-                                    .order(ByteOrder.BIG_ENDIAN)
-                                    .asShortBuffer();
-
-                            short[] samples = new short[shortBuffer.remaining()];
-                            shortBuffer.get(samples);
-
-                            int inputFrames = samples.length / channels;
-                            int outputFrames = (int) (inputFrames / speed);
-
-                            short[] output = new short[outputFrames * channels];
-
-                            double framePos = 0.0;
-
-                            for (int outFrame = 0; outFrame < outputFrames; outFrame++) {
-                                int frame1 = (int) framePos;
-                                int frame2 = Math.min(frame1 + 1, inputFrames - 1);
-                                double frac = framePos - frame1;
-
-                                for (int ch = 0; ch < channels; ch++) {
-                                    short a = samples[frame1 * channels + ch];
-                                    short b = samples[frame2 * channels + ch];
-
-                                    output[outFrame * channels + ch] =
-                                            (short) (a + frac * (b - a));
-                                }
-
-                                framePos += speed;
-                            }
-
-                            // Convert short[] -> byte[]
-                            ByteBuffer out = ByteBuffer.allocate(output.length * 2)
-                                    .order(ByteOrder.BIG_ENDIAN);
-
-                            for (short sample : output) {
-                                out.putShort(sample);
-                            }
-                            receivedData = out.array();
                         }
                         StringBuilder cachePathBuilder = new StringBuilder(DisxTmpHandler.TMP_PROCESSED_CACHE_PATH + "/"
                                 + videoId);
