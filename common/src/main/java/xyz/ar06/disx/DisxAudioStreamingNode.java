@@ -10,15 +10,10 @@ import net.minecraft.world.entity.player.Player;
 import xyz.ar06.disx.audio_filters.*;
 import xyz.ar06.disx.utils.DisxYoutubeResolver;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +75,7 @@ public class DisxAudioStreamingNode {
                         String fileName = file.getName();
                         HashMap<DisxAudioFilterType, Boolean> matchedEffects = new HashMap<>();
                         for (DisxAudioFilterType queriedFilter : this.activeFilters){
-                            if (fileName.contains("." + queriedFilter.name())){
+                            if (fileName.contains("." + queriedFilter.name()) && fileName.contains(this.videoId)){
                                 matchedEffects.put(queriedFilter, true);
                             } else {
                                 matchedEffects.put(queriedFilter, false);
@@ -99,30 +94,14 @@ public class DisxAudioStreamingNode {
                         File downloadFile = DisxYoutubeResolver.resolveFile(videoId);
                         byte[] receivedData = Files.toByteArray(downloadFile);
                         DisxLogger.debug("Beginning audio processing");
-
-                        int channels = 2;
-                        if (this.activeFilters.contains(DisxAudioFilterType.REVERSE)){
-                            DisxLogger.debug("REVERSE effect is active; Reversing audio data before creating cache");
-                            receivedData = new DisxReverseFilter().process(receivedData);
-                        }
-                        if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_2) || this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
-                            DisxLogger.debug("TEMPO effect is active; Speeding up audio data before creating cache");
-                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_1)){
-                                receivedData = new DisxTempo1Filter().process(receivedData);
-                            }
-                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_2)){
-                                receivedData = new DisxTempo2Filter().process(receivedData);
-                            }
-                            if (this.activeFilters.contains(DisxAudioFilterType.TEMPO_3)){
-                                receivedData = new DisxTempo3Filter().process(receivedData);
-                            }
-                        }
                         StringBuilder cachePathBuilder = new StringBuilder(DisxTmpHandler.TMP_PROCESSED_CACHE_PATH + "/"
                                 + videoId);
                         for (DisxAudioFilterType filter : this.getActiveFilters()){
                             cachePathBuilder.append(".").append(filter.name());
+                            DisxLogger.debug("Detected " + filter.name() + " filter, applying it to audio");
+                            receivedData = filter.create().process(receivedData);
                         }
-                        cachePathBuilder.append(".pcm.wav");
+                        cachePathBuilder.append(".pcm");
                         File cacheFile = new File(cachePathBuilder.toString());
                         Files.write(receivedData, cacheFile);
                         DisxLogger.debug("Processing done; storing audio cache and passing to audio streamer");

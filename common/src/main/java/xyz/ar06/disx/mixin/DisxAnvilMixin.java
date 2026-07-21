@@ -31,7 +31,9 @@ public class DisxAnvilMixin {
                     for (Tag tag : enchantments){
                         if (tag instanceof CompoundTag compoundTag){
                             if (!((compoundTag.get("id").getAsString().equals("disx:retrograde_curse"))
-                            || compoundTag.get("id").getAsString().equals("disx:tempo_curse"))){
+                            || compoundTag.get("id").getAsString().equals("disx:tempo_curse")
+                            || compoundTag.get("id").getAsString().equals("disx:resonance_curse")
+                            )){
                                 menu.getSlot(2).set(ItemStack.EMPTY);
                             };
                         }

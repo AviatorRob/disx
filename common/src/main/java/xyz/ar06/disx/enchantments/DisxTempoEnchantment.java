@@ -21,7 +21,7 @@ public class DisxTempoEnchantment extends Enchantment {
         super(rarity, enchantmentCategory, equipmentSlots);
     }
 
-    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab, Registrar<Item> itemsRegistrar){
+    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab){
         enchantmentRegistration = enchantmentRegistrar.register(new ResourceLocation("disx","tempo_curse"),
                 () -> new DisxTempoEnchantment(Rarity.UNCOMMON, EnchantmentCategory.FISHING_ROD, new EquipmentSlot[]{})
         );

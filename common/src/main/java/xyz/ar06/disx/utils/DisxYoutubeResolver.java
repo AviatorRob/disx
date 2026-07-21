@@ -43,8 +43,8 @@ public class DisxYoutubeResolver {
             if (response.statusCode() == 200){
                 DisxLogger.debug("Got response from YT-SRC API. Downloading audio...");
                 InputStream in = response.body();
-                File newFile = new File(DisxTmpHandler.TMP_CACHE_PATH + "/" + videoId + ".pcm.wav");
-                Files.copy(in, Path.of(DisxTmpHandler.TMP_CACHE_PATH + "/" + videoId + ".pcm.wav"), StandardCopyOption.REPLACE_EXISTING);
+                File newFile = new File(DisxTmpHandler.TMP_CACHE_PATH + "/" + videoId + ".pcm");
+                Files.copy(in, Path.of(DisxTmpHandler.TMP_CACHE_PATH + "/" + videoId + ".pcm"), StandardCopyOption.REPLACE_EXISTING);
                 return newFile;
             } else {
                 DisxLogger.error("Disx Error: YT-SRC API response failed. Status Code: " + response.statusCode());

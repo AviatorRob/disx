@@ -56,7 +56,7 @@ public class DisxRetrogradeCurseEnchantment extends Enchantment {
         return (itemStack.getItem() instanceof DisxCustomDisc);
     }
 
-    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab, Registrar<Item> itemsRegistrar){
+    public static void registerEnchantment(Registrar<Enchantment> enchantmentRegistrar, RegistrySupplier<CreativeModeTab> creativeModeTab){
         enchantmentRegistration = enchantmentRegistrar.register(
                 new ResourceLocation("disx","retrograde_curse"),
                 () -> new DisxRetrogradeCurseEnchantment(Rarity.COMMON, EnchantmentCategory.FISHING_ROD, new EquipmentSlot[]{})

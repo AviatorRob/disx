@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.ticks.ContainerSingleItem;
+import xyz.ar06.disx.enchantments.DisxDiscEnchantmentHelper;
 import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
 import xyz.ar06.disx.enchantments.DisxTempoEnchantment;
 import xyz.ar06.disx.items.DisxCustomDisc;
@@ -123,22 +124,8 @@ public class DisxAdvancedJukeboxEntity extends BlockEntity implements ContainerS
             String videoId = itemStack.getTag().getString("videoId");
             int jukeboxPower = this.getLevel().getBestNeighborSignal(this.getBlockPos());
             boolean loop = jukeboxPower > 0;
-            ArrayList<DisxAudioFilterType> audioFilters = new ArrayList<DisxAudioFilterType>();
+            ArrayList<DisxAudioFilterType> audioFilters = DisxDiscEnchantmentHelper.buildAudioFilterArray(itemStack);
             int rogueRadius = -1;
-
-            if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), itemStack) > 0){
-                audioFilters.add(DisxAudioFilterType.REVERSE);
-                DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
-            }
-            int tempoEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), itemStack);
-            if (tempoEnchantmentLevel > 0){
-                DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
-                switch (tempoEnchantmentLevel){
-                    case 1 -> audioFilters.add(DisxAudioFilterType.TEMPO_1);
-                    case 2 -> audioFilters.add(DisxAudioFilterType.TEMPO_2);
-                    case 3 -> audioFilters.add(DisxAudioFilterType.TEMPO_3);
-                };
-            }
 
             DisxServerAudioRegistry.addToRegistry(this.getBlockPos(), videoId, player, level.dimension(), loop, DisxAudioMotionType.STATIC, new UUID(0L, 0L), rogueRadius, audioFilters);
         } else {

@@ -31,6 +31,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import xyz.ar06.disx.*;
 import xyz.ar06.disx.audio_filters.DisxAudioFilterType;
 import xyz.ar06.disx.config.DisxConfigHandler;
+import xyz.ar06.disx.enchantments.DisxDiscEnchantmentHelper;
 import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
 import xyz.ar06.disx.enchantments.DisxTempoEnchantment;
 import xyz.ar06.disx.items.DisxCustomDisc;
@@ -82,21 +83,8 @@ public class DisxEnderAdvancedJukebox extends Block{
                             DisxJukeboxUsageCooldownManager.updateCooldown(blockPos, level.dimension());
                             DisxLogger.debug("Sending loading video message");
                             DisxServerPacketIndex.ServerPackets.loadingVideoIdMessage(videoId, player);
-                            DisxLogger.debug("Checking for any active server-side audio filters");
-                            ArrayList<DisxAudioFilterType> audioFilters = new ArrayList<DisxAudioFilterType>();
-                            if (EnchantmentHelper.getItemEnchantmentLevel(DisxRetrogradeCurseEnchantment.enchantmentRegistration.get(), handStack) > 0){
-                                audioFilters.add(DisxAudioFilterType.REVERSE);
-                                DisxLogger.debug("Detected REVERSE curse on disc, adding to audioFilter array");
-                            }
-                            int tempoEnchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(DisxTempoEnchantment.enchantmentRegistration.get(), handStack);
-                            if (tempoEnchantmentLevel > 0){
-                                DisxLogger.debug("Detected TEMPO curse on disc, adding to audioFilter array");
-                                switch (tempoEnchantmentLevel){
-                                    case 1 -> audioFilters.add(DisxAudioFilterType.TEMPO_1);
-                                    case 2 -> audioFilters.add(DisxAudioFilterType.TEMPO_2);
-                                    case 3 -> audioFilters.add(DisxAudioFilterType.TEMPO_3);
-                                };
-                            }
+                            DisxLogger.debug("Checking for any active audio filters");
+                            ArrayList<DisxAudioFilterType> audioFilters = DisxDiscEnchantmentHelper.buildAudioFilterArray(handStack);
                             DisxLogger.debug("Calling add to registry (LIVE)");
                             DisxServerAudioRegistry.addToRegistry(blockPos, videoId, player, level.dimension(), false, DisxAudioMotionType.LIVE, player.getUUID(), -1, audioFilters);
                             helper.disx$setEnderAdvancedJukeboxInventory(ContainerHelper.saveAllItems(new CompoundTag(), invList));

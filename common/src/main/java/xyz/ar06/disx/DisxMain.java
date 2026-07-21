@@ -9,6 +9,7 @@ import xyz.ar06.disx.blocks.*;
 import xyz.ar06.disx.client_only.DisxClientMain;
 import xyz.ar06.disx.commands.*;
 import xyz.ar06.disx.config.DisxConfigHandler;
+import xyz.ar06.disx.enchantments.DisxResonanceEnchantment;
 import xyz.ar06.disx.enchantments.DisxRetrogradeCurseEnchantment;
 import xyz.ar06.disx.enchantments.DisxTempoEnchantment;
 import xyz.ar06.disx.entities.DisxAdvancedJukeboxEntity;
@@ -53,7 +54,13 @@ public class DisxMain {
         Registrar<EntityType<?>> entityTypeRegistrar = REGISTRAR_MANAGER.get().get(Registries.ENTITY_TYPE);
         Registrar<Enchantment> enchantmentRegistrar = REGISTRAR_MANAGER.get().get(Registries.ENCHANTMENT);
         //Creative Mode Tab Registration
-        RegistrySupplier<CreativeModeTab> creativeModeTab = tabRegistrar.register(new ResourceLocation("disx", "creativemodetab.disx"), () -> CreativeTabRegistry.create(Component.translatable("category.disx.tab"), () -> new ItemStack(itemsRegistrar.get(new ResourceLocation("disx", "blank_disc")))));
+        RegistrySupplier<CreativeModeTab> creativeModeTab = tabRegistrar.register(
+                new ResourceLocation("disx", "creativemodetab.disx"),
+                () -> CreativeTabRegistry.create(
+                        Component.translatable("category.disx.tab"),
+                        () -> new ItemStack(itemsRegistrar.get(new ResourceLocation("disx", "blank_disc")))
+                )
+        );
         //Item Registration Calls
         DisxVinylShard.registerItem(itemsRegistrar, creativeModeTab);
         DisxBlankDisc.registerItem(itemsRegistrar, creativeModeTab);
@@ -96,8 +103,10 @@ public class DisxMain {
         //Entity Registration Calls
         DisxAdvancedJukeboxMinecart.registerEntityType(entityTypeRegistrar);
         //Enchantment Registration Calls
-        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab, itemsRegistrar);
-        DisxTempoEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab, itemsRegistrar);
+        DisxRetrogradeCurseEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+        DisxTempoEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+        DisxResonanceEnchantment.registerEnchantment(enchantmentRegistrar, creativeModeTab);
+
 
         //Pull Mod Info
         DisxModInfo.pullLatestVersion();

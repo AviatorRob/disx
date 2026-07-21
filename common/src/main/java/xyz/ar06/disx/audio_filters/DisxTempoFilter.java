@@ -1,14 +1,25 @@
 package xyz.ar06.disx.audio_filters;
 
+import xyz.ar06.disx.DisxLogger;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
-public class DisxTempo3Filter implements DisxAudioFilter{
+public class DisxTempoFilter implements DisxAudioFilter{
+
+    private double speed = 1;
+    public DisxTempoFilter(int lvl){
+        switch (lvl){
+            case 1 -> speed = 1.25;
+            case 2 -> speed = 1.5;
+            case 3 -> speed = 2;
+        }
+    }
+
     @Override
     public byte[] process(byte[] audio) {
         int channels = 2;
-        double speed = 2;
         ShortBuffer shortBuffer = ByteBuffer.wrap(audio)
                 .order(ByteOrder.BIG_ENDIAN)
                 .asShortBuffer();
@@ -51,6 +62,6 @@ public class DisxTempo3Filter implements DisxAudioFilter{
 
     @Override
     public DisxAudioFilterType getFilterType() {
-        return DisxAudioFilterType.TEMPO_3;
+        return DisxAudioFilterType.TEMPO_1;
     }
 }
